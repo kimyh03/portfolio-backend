@@ -110,6 +110,12 @@ type User {
   certificates: [Certificate!]
 }
 
+type SignInOutput {
+  ok: Boolean
+  error: String
+  token: String
+}
+
 type SignUpOutput {
   ok: Boolean
   error: String
@@ -122,10 +128,16 @@ type Query {
 
 type Mutation {
   signUp(input: SignUpInput!): SignUpOutput!
+  signIn(input: SignInInput!): SignInOutput!
 }
 
 input SignUpInput {
   email: String!
   password: String!
   username: String!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
 }
