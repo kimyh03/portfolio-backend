@@ -15,9 +15,22 @@ import { Answer } from './post/entities/answer.entity';
 import { Question } from './post/entities/question.entity';
 import { Application } from './application/entities/application.entity';
 import { Certificate } from './certificate/entities/certificate.entity';
+import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      validationSchema: Joi.object({
+        DATABASE_HOST: Joi.string().required(),
+        DATABASE_PORT: Joi.string().required(),
+        DATABASE_USERNAME: Joi.string().required(),
+        DATABASE_PASSWORD: Joi.string().required(),
+        DATABASE_NAME: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        HASH_ROUNDS: Joi.string().required(),
+      }),
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
