@@ -8,6 +8,13 @@ import { ApplicationModule } from './application/application.module';
 import { CertificateModule } from './certificate/certificate.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
+import { User } from './user/entities/user.entity';
+import { Post } from './post/entities/post.entity';
+import { Like } from './post/entities/like.entity';
+import { Answer } from './post/entities/answer.entity';
+import { Question } from './post/entities/question.entity';
+import { Application } from './application/entities/application.entity';
+import { Certificate } from './certificate/entities/certificate.entity';
 
 @Module({
   imports: [
@@ -20,6 +27,7 @@ import { GraphQLModule } from '@nestjs/graphql';
       database: 'portfolio',
       logging: true,
       synchronize: true,
+      entities: [User, Post, Like, Question, Answer, Application, Certificate],
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',

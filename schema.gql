@@ -2,6 +2,114 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Answer {
+  id: ID!
+  createdAt: DateTime!
+  text: String!
+  question: Question!
+  questionId: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Question {
+  id: ID!
+  createdAt: DateTime!
+  text: String!
+  user: User!
+  userId: Float!
+  post: Post!
+  postId: Float!
+  answer: Answer
+}
+
+type Like {
+  id: ID!
+  createdAt: DateTime!
+  user: User!
+  userId: Float!
+  post: Post!
+  postId: Float!
+}
+
+type Post {
+  id: ID!
+  createdAt: DateTime!
+  title: String!
+  description: String!
+  category: postCategory!
+  date: DateTime!
+  rigion: postRigion!
+  adress: String!
+  host: String!
+  NumOfRecruitment: Float!
+  recognizedHours: Float!
+  isOpened: Boolean!
+  isCompleted: Boolean!
+  user: User!
+  userId: Float!
+  applications: [Application!]
+  likes: [Like!]
+  questions: [Question!]
+}
+
+enum postCategory {
+  environment
+  eventSupport
+  communityService
+  ruralAtivity
+}
+
+enum postRigion {
+  Seoul
+  Gyeonggi
+  Incheon
+  Chungcheong
+  Jeolla
+  Gyeongsang
+  Jeju
+}
+
+type Application {
+  id: ID!
+  createdAt: DateTime!
+  status: String!
+  user: User!
+  userId: Float!
+  post: Post!
+  postId: Float!
+}
+
+type Certificate {
+  id: ID!
+  createdAt: DateTime!
+  title: String!
+  host: String!
+  recognizedHours: Float!
+  date: DateTime!
+  user: User!
+  userId: Float!
+}
+
+type User {
+  id: ID!
+  createdAt: DateTime!
+  email: String!
+  username: String!
+  password: String!
+  avatar: String
+  activityCount: Float!
+  activityTime: Float!
+  posts: [Post!]
+  applications: [Application!]
+  likes: [Like!]
+  questions: [Question!]
+  certificates: [Certificate!]
+}
+
 type Query {
   getHello: String!
 }
