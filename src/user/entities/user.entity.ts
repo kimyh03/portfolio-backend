@@ -12,7 +12,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 export class User extends CoreEntity {
   // 이메일(로그인 ID)
   @Field()
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   // 사용자 넥네임
