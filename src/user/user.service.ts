@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { AuthService } from 'src/auth/auth.service';
 import { SignUpInput, SignUpOutput } from './dtos/signUp.dto';
 import { SignInInput, SignInOutput } from './dtos/signIn.dto';
+import { ConfigService } from '@nestjs/config';
+import { HASH_ROUNDS } from 'src/shared/constants';
 
 @Injectable()
 export class UserService {
@@ -13,6 +15,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly users: Repository<User>,
     private readonly authService: AuthService,
+    private readonly configService: ConfigService,
   ) {}
 
   async signUp({
@@ -27,7 +30,10 @@ export class UserService {
           ok: false,
           error: '이미 가입된 정보입니다.',
         };
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(
+        password,
+        +this.configService.get(HASH_ROUNDS),
+      );
       const newUser = this.users.create({
         email,
         password: hashedPassword,

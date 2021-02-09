@@ -1,1 +1,2 @@
 export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
+export const HASH_ROUNDS = 'HASH_ROUNDS';
