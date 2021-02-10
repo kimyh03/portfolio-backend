@@ -32,10 +32,12 @@ export class User extends CoreEntity {
 
   // 총 봉사활동 횟수(certificates coulmn count)
   @Field()
+  @Column({ default: 0 })
   activityCount: number;
 
   // 총 봉사시간
   @Field()
+  @Column({ default: 0 })
   activityTime: number;
 
   @Field(() => [Post], { nullable: true })
