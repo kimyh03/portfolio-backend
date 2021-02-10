@@ -14,7 +14,15 @@ export class AuthService {
   ) {}
   signToken(userId: number) {
     try {
-      return jwt.sign({ id: userId }, this.options.jwtSecretKey);
+      return jwt.sign({ userId }, this.options.jwtSecretKey);
+    } catch (e) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  decodeToken(token: string) {
+    try {
+      return jwt.verify(token, this.options.jwtSecretKey);
     } catch (e) {
       throw new InternalServerErrorException();
     }
