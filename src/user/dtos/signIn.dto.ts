@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-
+import { CoreOutput } from '../../shared/core.dto';
 @InputType()
 export class SignInInput {
   @Field()
@@ -10,13 +10,7 @@ export class SignInInput {
 }
 
 @ObjectType()
-export class SignInOutput {
-  @Field({ nullable: true })
-  ok?: boolean;
-
-  @Field({ nullable: true })
-  error?: string;
-
+export class SignInOutput extends CoreOutput {
   @Field({ nullable: true })
   token?: string;
 }
