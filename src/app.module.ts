@@ -23,6 +23,7 @@ import { Certificate } from './certificate/entities/certificate.entity';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtMiddleware } from './auth/auth.middleware';
+import { S3Module } from './shared/S3/S3.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { JwtMiddleware } from './auth/auth.middleware';
     PostModule,
     ApplicationModule,
     CertificateModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
