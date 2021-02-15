@@ -110,6 +110,11 @@ type Application {
   postId: Float!
 }
 
+type EditAvatarOutput {
+  ok: Boolean!
+  error: String
+}
+
 type GetprofileOutput {
   ok: Boolean!
   error: String
@@ -143,6 +148,7 @@ input GetProfileInput {
 type Mutation {
   signUp(input: SignUpInput!): SignUpOutput!
   signIn(input: SignInInput!): SignInOutput!
+  editAvatar(input: EditAvatarInput!): EditAvatarOutput!
 }
 
 input SignUpInput {
@@ -154,4 +160,8 @@ input SignUpInput {
 input SignInInput {
   email: String!
   password: String!
+}
+
+input EditAvatarInput {
+  avatarKey: String!
 }

@@ -1,5 +1,8 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Auth } from 'src/auth/auth.guard';
 import { AuthUser } from 'src/auth/authUser.decorator';
+import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
 import { SignInInput, SignInOutput } from './dtos/signIn.dto';
 import { SignUpInput, SignUpOutput } from './dtos/signUp.dto';
@@ -31,5 +34,14 @@ export class UserResolver {
   ): Promise<GetprofileOutput> {
     const isSelf = authUser?.id === input.userId;
     return await this.userService.getProfile(isSelf, input);
+  }
+
+  @UseGuards(Auth)
+  @Mutation(() => EditAvatarOutput)
+  async editAvatar(
+    @AuthUser() authUser: User,
+    @Args('input') input: EditAvatarInput,
+  ): Promise<EditAvatarOutput> {
+    return await this.userService.editAvatar(authUser.id, input);
   }
 }

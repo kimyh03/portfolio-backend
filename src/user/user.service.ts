@@ -11,6 +11,8 @@ import { HASH_ROUNDS } from 'src/shared/constants';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
 import { Like } from 'src/post/entities/like.entity';
 import { Application } from 'src/application/entities/application.entity';
+import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
+import { S3Service } from 'src/shared/S3/S3.service';
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,7 @@ export class UserService {
     private readonly likes: Repository<Like>,
     @InjectRepository(Application)
     private readonly applications: Repository<Application>,
+    private readonly s3Service: S3Service,
   ) {}
 
   async signUp({
@@ -121,6 +124,29 @@ export class UserService {
         user,
         likes,
         applications,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
+    }
+  }
+
+  async editAvatar(
+    userId: number,
+    { avatarKey }: EditAvatarInput,
+  ): Promise<EditAvatarOutput> {
+    try {
+      const avatarUrl = `https://hoony-portfolio.s3.ap-northeast-2.amazonaws.com/${avatarKey}`;
+      const user = await this.users.findOneOrFail(userId);
+      if (user.avatar) {
+        await this.s3Service.delete(user.avatar.split('avatar')[1]);
+      }
+      user.avatar = avatarUrl;
+      await this.users.save(user);
+      return {
+        ok: true,
       };
     } catch (e) {
       return {
