@@ -2,6 +2,22 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Certificate {
+  id: ID!
+  createdAt: DateTime!
+  title: String!
+  host: String!
+  recognizedHours: Float!
+  date: DateTime!
+  user: User!
+  userId: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Answer {
   id: ID!
   createdAt: DateTime!
@@ -9,11 +25,6 @@ type Answer {
   question: Question!
   questionId: Float!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Question {
   id: ID!
@@ -33,6 +44,22 @@ type Like {
   userId: Float!
   post: Post!
   postId: Float!
+}
+
+type User {
+  id: ID!
+  createdAt: DateTime!
+  email: String!
+  username: String!
+  password: String!
+  avatar: String
+  activityCount: Float!
+  activityTime: Float!
+  posts: [Post!]
+  applications: [Application!]
+  likes: [Like!]
+  questions: [Question!]
+  certificates: [Certificate!]
 }
 
 type Post {
@@ -83,47 +110,34 @@ type Application {
   postId: Float!
 }
 
-type Certificate {
-  id: ID!
-  createdAt: DateTime!
-  title: String!
-  host: String!
-  recognizedHours: Float!
-  date: DateTime!
-  user: User!
-  userId: Float!
-}
-
-type User {
-  id: ID!
-  createdAt: DateTime!
-  email: String!
-  username: String!
-  password: String!
-  avatar: String
-  activityCount: Float!
-  activityTime: Float!
-  posts: [Post!]
-  applications: [Application!]
+type GetprofileOutput {
+  ok: Boolean!
+  error: String
+  user: User
+  isSelf: Boolean
   likes: [Like!]
-  questions: [Question!]
-  certificates: [Certificate!]
+  applications: [Application!]
 }
 
 type SignInOutput {
-  ok: Boolean
+  ok: Boolean!
   error: String
   token: String
 }
 
 type SignUpOutput {
-  ok: Boolean
+  ok: Boolean!
   error: String
   token: String
 }
 
 type Query {
   getHello: String!
+  getProfile(input: GetProfileInput!): GetprofileOutput!
+}
+
+input GetProfileInput {
+  userId: Float!
 }
 
 type Mutation {

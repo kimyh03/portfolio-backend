@@ -8,6 +8,9 @@ import { SignUpInput, SignUpOutput } from './dtos/signUp.dto';
 import { SignInInput, SignInOutput } from './dtos/signIn.dto';
 import { ConfigService } from '@nestjs/config';
 import { HASH_ROUNDS } from 'src/shared/constants';
+import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
+import { Like } from 'src/post/entities/like.entity';
+import { Application } from 'src/application/entities/application.entity';
 
 @Injectable()
 export class UserService {
@@ -16,6 +19,10 @@ export class UserService {
     private readonly users: Repository<User>,
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    @InjectRepository(Like)
+    private readonly likes: Repository<Like>,
+    @InjectRepository(Application)
+    private readonly applications: Repository<Application>,
   ) {}
 
   async signUp({
@@ -84,5 +91,42 @@ export class UserService {
 
   async findOneById(userId: number) {
     return await this.users.findOne(userId);
+  }
+
+  async getProfile(
+    isSelf: boolean,
+    { userId }: GetProfileInput,
+  ): Promise<GetprofileOutput> {
+    try {
+      const user = await this.users.findOneOrFail({
+        where: { id: userId },
+        relations: ['posts', 'certificates'],
+      });
+      let likes: Like[];
+      let applications: Application[];
+      if (isSelf) {
+        likes = await this.likes.find({
+          where: { userId },
+          relations: ['post'],
+        });
+        applications = await this.applications.find({
+          where: { userId },
+          relations: ['post'],
+        });
+      }
+      return {
+        ok: true,
+        error: null,
+        isSelf,
+        user,
+        likes,
+        applications,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
+    }
   }
 }
