@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { Like } from 'src/post/entities/like.entity';
+import { S3Service } from 'src/shared/S3/S3.service';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -27,6 +28,10 @@ const mockConfigService = () => ({
   get: jest.fn(),
 });
 
+const mockS3Service = () => ({
+  delete: jest.fn(),
+});
+
 describe('UserService', () => {
   let userService: UserService;
   let userRepository: MockRepository<User>;
@@ -35,6 +40,7 @@ describe('UserService', () => {
   let configService: ConfigService;
   let likeRepository: MockRepository<Like>;
   let applicationRepository: MockRepository<Application>;
+  let s3Service: S3Service;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -59,6 +65,10 @@ describe('UserService', () => {
           provide: getRepositoryToken(Application),
           useValue: mockRepository(),
         },
+        {
+          provide: S3Service,
+          useValue: mockS3Service(),
+        },
       ],
     }).compile();
     userRepository = module.get(getRepositoryToken(User));
@@ -67,6 +77,7 @@ describe('UserService', () => {
     configService = module.get<ConfigService>(ConfigService);
     likeRepository = module.get(getRepositoryToken(Like));
     applicationRepository = module.get(getRepositoryToken(Application));
+    s3Service = module.get<S3Service>(S3Service);
   });
 
   it('should be defined', () => {
@@ -117,6 +128,48 @@ describe('UserService', () => {
         error: null,
         applications: [],
         likes: [],
+      });
+    });
+  });
+
+  describe('editAvatar', () => {
+    const testUserArgs = {
+      id: 1,
+    };
+    const testInput = {
+      avatarKey: 'avatarKey',
+    };
+    it('should fail with not found user id', async () => {
+      userRepository.findOneOrFail.mockRejectedValue(
+        new Error('The user not found'),
+      );
+      const result = await userService.editAvatar(testUserArgs.id, testInput);
+      expect(result).toEqual({
+        ok: false,
+        error: 'The user not found',
+      });
+    });
+    it('should add avatar url', async () => {
+      userRepository.findOneOrFail.mockResolvedValue(testUserArgs);
+      const result = await userService.editAvatar(testUserArgs.id, testInput);
+
+      expect(s3Service.delete).toHaveBeenCalledTimes(0);
+      expect(result).toEqual({
+        ok: true,
+      });
+    });
+    it('should replace avatar url', async () => {
+      const testUserArgs = {
+        id: 1,
+        avatar: 'avatar',
+      };
+      userRepository.findOneOrFail.mockResolvedValue(testUserArgs);
+
+      const result = await userService.editAvatar(testUserArgs.id, testInput);
+
+      expect(s3Service.delete).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        ok: true,
       });
     });
   });
