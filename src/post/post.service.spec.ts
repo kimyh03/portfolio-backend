@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Post, postRigionEnum } from './entities/post.entity';
+import { Post, postCategoryEnum, postRigionEnum } from './entities/post.entity';
 import { PostService } from './post.service';
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const mockRepository = () => ({
@@ -40,14 +40,25 @@ describe('PostService', () => {
     const createPostArgs = {
       title: 'test',
       description: 'test',
-      category: 'test',
       date: new Date(),
       rigion: postRigionEnum.Seoul,
+      category: postCategoryEnum.communityService,
       adress: 'test',
       host: 'test',
       NumOfRecruitment: 1,
       recognizedHours: 1,
     };
-    it.todo('should create a post');
+
+    const testUser = {
+      id: 1,
+    };
+    it('should create a post', async () => {
+      postRepository.create.mockResolvedValue(createPostArgs);
+      const result = await postService.createPost(createPostArgs, testUser.id);
+
+      expect(postRepository.create).toHaveBeenCalledTimes(1);
+      expect(postRepository.save).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
