@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Auth } from 'src/auth/auth.guard';
-import { AuthUser } from 'src/auth/authUser.decorator';
+import { Auth } from 'src/shared/auth/auth.guard';
+import { AuthUser } from 'src/shared/auth/authUser.decorator';
 import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
 import { SignInInput, SignInOutput } from './dtos/signIn.dto';

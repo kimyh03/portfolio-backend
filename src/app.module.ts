@@ -7,7 +7,7 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './shared/auth/auth.module';
 import { PostModule } from './post/post.module';
 import { ApplicationModule } from './application/application.module';
 import { CertificateModule } from './certificate/certificate.module';
@@ -22,7 +22,7 @@ import { Application } from './application/entities/application.entity';
 import { Certificate } from './certificate/entities/certificate.entity';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { JwtMiddleware } from './auth/auth.middleware';
+import { JwtMiddleware } from './shared/auth/auth.middleware';
 import { S3Module } from './shared/S3/S3.module';
 
 @Module({

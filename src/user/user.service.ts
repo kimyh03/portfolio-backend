@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from 'src/shared/auth/auth.service';
 import { SignUpInput, SignUpOutput } from './dtos/signUp.dto';
 import { SignInInput, SignInOutput } from './dtos/signIn.dto';
 import { ConfigService } from '@nestjs/config';
