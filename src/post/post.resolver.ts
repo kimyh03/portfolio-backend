@@ -17,6 +17,6 @@ export class PostResolver {
     @AuthUser() authUser: User,
     @Args('input') input: CreatePostInput,
   ): Promise<CreatePostOutput> {
-    return await this.postService.createPost(input, authUser);
+    return await this.postService.createPost(input, authUser.id);
   }
 }

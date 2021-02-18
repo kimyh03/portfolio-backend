@@ -13,10 +13,10 @@ export class PostService {
 
   async createPost(
     input: CreatePostInput,
-    user: User,
+    userId: number,
   ): Promise<CreatePostOutput> {
     try {
-      const newPost = this.posts.create({ ...input, user });
+      const newPost = this.posts.create({ ...input, userId });
       await this.posts.save(newPost);
       return {
         ok: true,
