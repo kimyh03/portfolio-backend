@@ -1,6 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Application } from 'src/application/entities/application.entity';
 import { Repository } from 'typeorm';
+import { Like } from './entities/like.entity';
 import { Post, postCategoryEnum, postRigionEnum } from './entities/post.entity';
 import { PostService } from './post.service';
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
@@ -17,6 +19,9 @@ describe('PostService', () => {
   let postService: PostService;
   let postRepository: MockRepository<Post>;
 
+  let likeRepository: MockRepository<Like>;
+  let applicationRepository: MockRepository<Application>;
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -25,15 +30,27 @@ describe('PostService', () => {
           provide: getRepositoryToken(Post),
           useValue: mockRepository(),
         },
+        {
+          provide: getRepositoryToken(Like),
+          useValue: mockRepository(),
+        },
+        {
+          provide: getRepositoryToken(Application),
+          useValue: mockRepository(),
+        },
       ],
     }).compile();
     postService = module.get<PostService>(PostService);
     postRepository = module.get(getRepositoryToken(Post));
+    likeRepository = module.get(getRepositoryToken(Like));
+    applicationRepository = module.get(getRepositoryToken(Application));
   });
 
   it('should be defined', () => {
     expect(postService).toBeDefined();
     expect(postRepository).toBeDefined();
+    expect(likeRepository).toBeDefined();
+    expect(applicationRepository).toBeDefined();
   });
 
   describe('createPost', () => {
@@ -63,8 +80,52 @@ describe('PostService', () => {
   });
 
   describe('getPostDetail', () => {
-    it.todo('should fail with not found post id');
-    it.todo('should get post detail (not logged in)');
-    it.todo('should get post detail (logged in)');
+    const getPostDetailArgs = {
+      id: 1,
+    };
+    it('should fail with not found post id', async () => {
+      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
+
+      const result = await postService.getPostDetail({
+        postId: getPostDetailArgs.id,
+      });
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should get post detail (not logged in)', async () => {
+      postRepository.findOneOrFail.mockResolvedValue(getPostDetailArgs);
+
+      const result = await postService.getPostDetail({
+        postId: getPostDetailArgs.id,
+      });
+
+      expect(result).toEqual({
+        ok: true,
+        post: getPostDetailArgs,
+      });
+    });
+    it('should get post detail (logged in)', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...getPostDetailArgs,
+        userId: 1,
+      });
+      likeRepository.findOne.mockResolvedValue({ id: 1 });
+      applicationRepository.findOne.mockResolvedValue({ id: 1 });
+
+      const result = await postService.getPostDetail(
+        {
+          postId: getPostDetailArgs.id,
+        },
+        1,
+      );
+
+      expect(result).toEqual({
+        ok: true,
+        post: { ...getPostDetailArgs, userId: 1 },
+        isMine: true,
+        isApplied: true,
+        isLiked: true,
+      });
+    });
   });
 });
