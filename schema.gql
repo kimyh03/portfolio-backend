@@ -136,9 +136,15 @@ type SignUpOutput {
   token: String
 }
 
+type CreatePostOutput {
+  ok: Boolean!
+  error: String
+}
+
 type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
+  getMe: User!
 }
 
 input GetProfileInput {
@@ -149,6 +155,7 @@ type Mutation {
   signUp(input: SignUpInput!): SignUpOutput!
   signIn(input: SignInInput!): SignInOutput!
   editAvatar(input: EditAvatarInput!): EditAvatarOutput!
+  createPost(input: CreatePostInput!): CreatePostOutput!
 }
 
 input SignUpInput {
@@ -164,4 +171,16 @@ input SignInInput {
 
 input EditAvatarInput {
   avatarKey: String!
+}
+
+input CreatePostInput {
+  title: String!
+  description: String!
+  category: postCategory!
+  date: DateTime!
+  rigion: postRigion!
+  adress: String!
+  host: String!
+  NumOfRecruitment: Float!
+  recognizedHours: Float!
 }
