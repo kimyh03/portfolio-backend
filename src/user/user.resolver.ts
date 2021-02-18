@@ -44,4 +44,10 @@ export class UserResolver {
   ): Promise<EditAvatarOutput> {
     return await this.userService.editAvatar(authUser.id, input);
   }
+
+  @UseGuards(Auth)
+  @Query(() => User)
+  async getMe(@AuthUser() authUser: User) {
+    return authUser;
+  }
 }
