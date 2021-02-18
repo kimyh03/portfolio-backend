@@ -61,4 +61,10 @@ describe('PostService', () => {
       expect(result).toEqual({ ok: true });
     });
   });
+
+  describe('getPostDetail', () => {
+    it.todo('should fail with not found post id');
+    it.todo('should get post detail (not logged in)');
+    it.todo('should get post detail (logged in)');
+  });
 });
