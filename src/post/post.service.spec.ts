@@ -13,6 +13,7 @@ const mockRepository = () => ({
   findOneOrFail: jest.fn(),
   delete: jest.fn(),
   find: jest.fn(),
+  remove: jest.fn(),
 });
 
 describe('PostService', () => {
@@ -130,8 +131,38 @@ describe('PostService', () => {
   });
 
   describe('deletePost', () => {
-    it.todo('should fail with not found post id');
-    it.todo('should fail with not author id');
-    it.todo('should delete post');
+    const deletePostArgs = {
+      postId: 1,
+    };
+    it('should fail with not found post id', async () => {
+      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
+
+      const result = await postService.deletePost(deletePostArgs, 1);
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should fail with not author id', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...deletePostArgs,
+        userId: 1,
+      });
+
+      const result = await postService.deletePost(deletePostArgs, 999);
+
+      expect(result).toEqual({
+        ok: false,
+        error: "You don't have a permission",
+      });
+    });
+    it('should delete post', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...deletePostArgs,
+        userId: 1,
+      });
+
+      const result = await postService.deletePost(deletePostArgs, 1);
+
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
