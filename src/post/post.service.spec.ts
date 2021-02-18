@@ -35,4 +35,19 @@ describe('PostService', () => {
     expect(postService).toBeDefined();
     expect(postRepository).toBeDefined();
   });
+
+  describe('createPost', () => {
+    const createPostArgs = {
+      title: 'test',
+      description: 'test',
+      category: 'test',
+      date: new Date(),
+      rigion: postRigionEnum.Seoul,
+      adress: 'test',
+      host: 'test',
+      NumOfRecruitment: 1,
+      recognizedHours: 1,
+    };
+    it.todo('should create a post');
+  });
 });
