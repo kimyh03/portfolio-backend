@@ -4,6 +4,7 @@ import { Auth } from 'src/shared/auth/auth.guard';
 import { AuthUser } from 'src/shared/auth/authUser.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
+import { DeletePostInput, DeletePostoutput } from './dtos/deletePost.dto';
 import {
   GetPostDetailInput,
   GetPostDetailOutput,
@@ -34,5 +35,14 @@ export class PostResolver {
       userId = authUser.id;
     }
     return await this.postService.getPostDetail(input, userId);
+  }
+
+  @UseGuards(Auth)
+  @Mutation(() => DeletePostoutput)
+  async deletePost(
+    @Args('input') input: DeletePostInput,
+    @AuthUser() authUser: User,
+  ): Promise<DeletePostoutput> {
+    return await this.postService.deletePost(input, authUser.id);
   }
 }

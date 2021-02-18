@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
 import { Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
+import { DeletePostInput, DeletePostoutput } from './dtos/deletePost.dto';
 import {
   GetPostDetailInput,
   GetPostDetailOutput,
@@ -76,6 +77,27 @@ export class PostService {
         isMine,
         isLiked,
         isApplied,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
+    }
+  }
+
+  async deletePost(
+    { postId }: DeletePostInput,
+    userId: number,
+  ): Promise<DeletePostoutput> {
+    try {
+      const post = await this.posts.findOneOrFail(postId);
+      if (post.userId !== userId) {
+        throw new Error("You don't have a permission");
+      }
+      await this.posts.remove(post);
+      return {
+        ok: true,
       };
     } catch (e) {
       return {

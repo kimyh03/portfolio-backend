@@ -141,6 +141,11 @@ type CreatePostOutput {
   error: String
 }
 
+type DeletePostoutput {
+  ok: Boolean!
+  error: String
+}
+
 type GetPostDetailOutput {
   ok: Boolean!
   error: String
@@ -170,6 +175,7 @@ type Mutation {
   signIn(input: SignInInput!): SignInOutput!
   editAvatar(input: EditAvatarInput!): EditAvatarOutput!
   createPost(input: CreatePostInput!): CreatePostOutput!
+  deletePost(input: DeletePostInput!): DeletePostoutput!
 }
 
 input SignUpInput {
@@ -197,4 +203,8 @@ input CreatePostInput {
   host: String!
   NumOfRecruitment: Float!
   recognizedHours: Float!
+}
+
+input DeletePostInput {
+  postId: Float!
 }
