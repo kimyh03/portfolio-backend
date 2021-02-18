@@ -141,14 +141,28 @@ type CreatePostOutput {
   error: String
 }
 
+type GetPostDetailOutput {
+  ok: Boolean!
+  error: String
+  post: Post
+  isMine: Boolean
+  isLiked: Boolean
+  isApplied: Boolean
+}
+
 type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
   getMe: User!
+  getPostDetail(input: GetPostDetailInput!): GetPostDetailOutput!
 }
 
 input GetProfileInput {
   userId: Float!
+}
+
+input GetPostDetailInput {
+  postId: Float!
 }
 
 type Mutation {
