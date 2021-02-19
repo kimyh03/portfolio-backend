@@ -260,4 +260,9 @@ describe('PostService', () => {
       expect(result).toEqual({ ok: true });
     });
   });
+
+  describe('createQuestion', () => {
+    it.todo('should fail witn not found post id');
+    it.todo('should create question');
+  });
 });
