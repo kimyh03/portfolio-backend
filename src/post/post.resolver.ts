@@ -4,6 +4,10 @@ import { Auth } from 'src/shared/auth/auth.guard';
 import { AuthUser } from 'src/shared/auth/authUser.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
+import {
+  CreateQuestionInput,
+  CreateQuestionOutput,
+} from './dtos/createQuestion.dto';
 import { DeletePostInput, DeletePostoutput } from './dtos/deletePost.dto';
 import {
   GetPostDetailInput,
@@ -17,6 +21,7 @@ import {
 } from './dtos/toggleOpenAndClose.dto';
 import { Like } from './entities/like.entity';
 import { Post } from './entities/post.entity';
+import { Question } from './entities/question.entity';
 import { PostService } from './post.service';
 
 @Resolver(() => Post)
@@ -79,5 +84,19 @@ export class LikeResolver {
     @AuthUser() authUser: User,
   ): Promise<ToggleLikeOutput> {
     return await this.postService.toggleLike(input, authUser.id);
+  }
+}
+
+@Resolver(() => Question)
+export class QuestionResolver {
+  constructor(private readonly postService: PostService) {}
+
+  @UseGuards(Auth)
+  @Mutation(() => CreateQuestionOutput)
+  async createQuestion(
+    @Args('input') input: CreateQuestionInput,
+    @AuthUser() authuser: User,
+  ): Promise<CreateQuestionOutput> {
+    return await this.postService.createQuestion(input, authuser.id);
   }
 }

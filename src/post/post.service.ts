@@ -3,6 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
 import { Brackets, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
+import {
+  CreateQuestionInput,
+  CreateQuestionOutput,
+} from './dtos/createQuestion.dto';
 import { DeletePostInput, DeletePostoutput } from './dtos/deletePost.dto';
 import {
   GetPostDetailInput,
@@ -16,6 +20,7 @@ import {
 } from './dtos/toggleOpenAndClose.dto';
 import { Like } from './entities/like.entity';
 import { Post } from './entities/post.entity';
+import { Question } from './entities/question.entity';
 
 @Injectable()
 export class PostService {
@@ -25,6 +30,8 @@ export class PostService {
     private readonly applications: Repository<Application>,
     @InjectRepository(Like)
     private readonly likes: Repository<Like>,
+    @InjectRepository(Question)
+    private readonly questions: Repository<Question>,
   ) {}
 
   async createPost(
@@ -231,6 +238,25 @@ export class PostService {
       return { ok: true };
     } catch (e) {
       return { ok: false, error: e.message };
+    }
+  }
+
+  async createQuestion(
+    { postId, text }: CreateQuestionInput,
+    userId: number,
+  ): Promise<CreateQuestionOutput> {
+    try {
+      await this.posts.findOneOrFail(postId);
+      const newQuestion = this.questions.create({ postId, userId, text });
+      await this.questions.save(newQuestion);
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
     }
   }
 }
