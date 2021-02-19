@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Auth } from 'src/shared/auth/auth.guard';
 import { AuthUser } from 'src/shared/auth/authUser.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { CreateAnswerInput, CreateAnswerOutput } from './dtos/createAnswer.dto';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import {
   CreateQuestionInput,
@@ -19,6 +20,7 @@ import {
   ToggleOpenAndCloseInput,
   ToggleOpenAndCloseOutput,
 } from './dtos/toggleOpenAndClose.dto';
+import { Answer } from './entities/answer.entity';
 import { Like } from './entities/like.entity';
 import { Post } from './entities/post.entity';
 import { Question } from './entities/question.entity';
@@ -98,5 +100,19 @@ export class QuestionResolver {
     @AuthUser() authuser: User,
   ): Promise<CreateQuestionOutput> {
     return await this.postService.createQuestion(input, authuser.id);
+  }
+}
+
+@Resolver(() => Answer)
+export class AnswerResolver {
+  constructor(private readonly postService: PostService) {}
+
+  @UseGuards(Auth)
+  @Mutation(() => CreateAnswerOutput)
+  async createAnswer(
+    @Args('input') input: CreateAnswerInput,
+    @AuthUser() authUser: User,
+  ): Promise<CreateAnswerOutput> {
+    return await this.postService.createAnswer(input, authUser.id);
   }
 }

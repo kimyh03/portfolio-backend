@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
 import { Brackets, Repository } from 'typeorm';
+import { CreateAnswerInput, CreateAnswerOutput } from './dtos/createAnswer.dto';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import {
   CreateQuestionInput,
@@ -18,6 +19,7 @@ import {
   ToggleOpenAndCloseInput,
   ToggleOpenAndCloseOutput,
 } from './dtos/toggleOpenAndClose.dto';
+import { Answer } from './entities/answer.entity';
 import { Like } from './entities/like.entity';
 import { Post } from './entities/post.entity';
 import { Question } from './entities/question.entity';
@@ -32,6 +34,8 @@ export class PostService {
     private readonly likes: Repository<Like>,
     @InjectRepository(Question)
     private readonly questions: Repository<Question>,
+    @InjectRepository(Answer)
+    private readonly answers: Repository<Answer>,
   ) {}
 
   async createPost(
@@ -249,6 +253,30 @@ export class PostService {
       await this.posts.findOneOrFail(postId);
       const newQuestion = this.questions.create({ postId, userId, text });
       await this.questions.save(newQuestion);
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
+    }
+  }
+
+  async createAnswer(
+    { questionId, text }: CreateAnswerInput,
+    userId: number,
+  ): Promise<CreateAnswerOutput> {
+    try {
+      const question = await this.questions.findOneOrFail(questionId, {
+        relations: ['post'],
+      });
+      if (question.post.userId !== userId) {
+        throw new Error("You don't have a permission");
+      }
+      const newAnswer = this.answers.create({ questionId, text });
+      await this.answers.save(newAnswer);
       return {
         ok: true,
       };

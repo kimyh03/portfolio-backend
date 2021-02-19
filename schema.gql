@@ -136,6 +136,11 @@ type SignUpOutput {
   token: String
 }
 
+type CreateAnswerOutput {
+  ok: Boolean!
+  error: String
+}
+
 type CreatePostOutput {
   ok: Boolean!
   error: String
@@ -211,6 +216,7 @@ type Mutation {
   toggleOpenAndClose(input: ToggleOpenAndCloseInput!): ToggleOpenAndCloseOutput!
   toggleLike(input: ToggleLikeInput!): ToggleLikeOutput!
   createQuestion(input: CreateQuestionInput!): CreateQuestionOutput!
+  createAnswer(input: CreateAnswerInput!): CreateAnswerOutput!
 }
 
 input SignUpInput {
@@ -254,5 +260,10 @@ input ToggleLikeInput {
 
 input CreateQuestionInput {
   postId: Float!
+  text: String!
+}
+
+input CreateAnswerInput {
+  questionId: Float!
   text: String!
 }
