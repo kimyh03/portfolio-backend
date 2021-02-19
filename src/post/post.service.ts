@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import { DeletePostInput, DeletePostoutput } from './dtos/deletePost.dto';
 import {
   GetPostDetailInput,
   GetPostDetailOutput,
 } from './dtos/getPostDetail.dto';
+import { GetPostsInput, GetPostsOutput } from './dtos/getPosts.dto';
 import {
   ToggleOpenAndCloseInput,
   ToggleOpenAndCloseOutput,
@@ -129,6 +130,82 @@ export class PostService {
       return {
         ok: true,
       };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
+    }
+  }
+
+  async getPosts({
+    categories,
+    rigions,
+    page,
+    openOnly,
+    searchTerm,
+  }: GetPostsInput): Promise<GetPostsOutput> {
+    try {
+      const LIMIT = 10;
+      const OFFSET = (page - 1) * LIMIT;
+
+      const baseQuery = this.posts
+        .createQueryBuilder('post')
+        .leftJoinAndSelect('post.applications', 'applications')
+        .orderBy('post.id', 'DESC')
+        .limit(LIMIT)
+        .offset(OFFSET);
+      const searchQuery = baseQuery.andWhere(
+        new Brackets((qb) => {
+          qb.where('post.title LIKE :title', {
+            title: `%${searchTerm}%`,
+          }).orWhere('post.description like :description', {
+            description: `%${searchTerm}%`,
+          });
+        }),
+      );
+
+      let query;
+      const addRigionQuery = (query) =>
+        query.andWhere('post.rigion IN (:...rigions)', {
+          rigions,
+        });
+      const addCategoryQuery = (query) =>
+        query.andWhere('post.category IN (:...categories)', {
+          categories,
+        });
+      if (!searchTerm) {
+        if (!categories.length && !rigions.length) {
+          query = baseQuery;
+        } else if (categories && !rigions.length) {
+          query = addCategoryQuery(baseQuery);
+        } else if (!categories.length && rigions) {
+          query = addRigionQuery(baseQuery);
+        } else {
+          query = addRigionQuery(addCategoryQuery(baseQuery));
+        }
+      } else {
+        if (!categories.length && !rigions.length) {
+          query = searchQuery;
+        } else if (categories && !rigions.length) {
+          query = addCategoryQuery(searchQuery);
+        } else if (!categories.length && rigions) {
+          query = addRigionQuery(searchQuery);
+        } else {
+          query = addRigionQuery(addCategoryQuery(searchQuery));
+        }
+      }
+      if (openOnly) {
+        query = query.andWhere('post.isOpened = true');
+      }
+
+      const makeResponse = async (query) => {
+        const [posts, totalCount] = await query.getManyAndCount();
+        const totalPage = Math.ceil(totalCount / 10);
+        return { posts, totalCount, totalPage };
+      };
+      const { posts, totalCount, totalPage } = await makeResponse(query);
+      return { ok: true, posts, totalCount, totalPage };
     } catch (e) {
       return {
         ok: false,

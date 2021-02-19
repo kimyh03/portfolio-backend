@@ -9,6 +9,7 @@ import {
   GetPostDetailInput,
   GetPostDetailOutput,
 } from './dtos/getPostDetail.dto';
+import { GetPostsInput, GetPostsOutput } from './dtos/getPosts.dto';
 import {
   ToggleOpenAndCloseInput,
   ToggleOpenAndCloseOutput,
@@ -57,5 +58,10 @@ export class PostResolver {
     @AuthUser() authUser: User,
   ): Promise<ToggleOpenAndCloseOutput> {
     return await this.postService.toggleOpenAndClose(input, authUser.id);
+  }
+
+  @Query(() => GetPostsOutput)
+  async getPosts(@Args('input') input: GetPostsInput): Promise<GetPostsOutput> {
+    return await this.postService.getPosts(input);
   }
 }
