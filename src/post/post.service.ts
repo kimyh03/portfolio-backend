@@ -230,7 +230,7 @@ export class PostService {
       }
       return { ok: true };
     } catch (e) {
-      return { ok: true, error: e.message };
+      return { ok: false, error: e.message };
     }
   }
 }
