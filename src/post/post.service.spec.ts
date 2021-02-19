@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
 import { Repository } from 'typeorm';
+import { Answer } from './entities/answer.entity';
 import { Like } from './entities/like.entity';
 import { Post, postCategoryEnum, postRigionEnum } from './entities/post.entity';
 import { Question } from './entities/question.entity';
@@ -24,6 +25,7 @@ describe('PostService', () => {
   let likeRepository: MockRepository<Like>;
   let applicationRepository: MockRepository<Application>;
   let questionRepository: MockRepository<Question>;
+  let answerRepository: MockRepository<Answer>;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -45,6 +47,10 @@ describe('PostService', () => {
           provide: getRepositoryToken(Question),
           useValue: mockRepository(),
         },
+        {
+          provide: getRepositoryToken(Answer),
+          useValue: mockRepository(),
+        },
       ],
     }).compile();
     postService = module.get<PostService>(PostService);
@@ -52,6 +58,7 @@ describe('PostService', () => {
     likeRepository = module.get(getRepositoryToken(Like));
     applicationRepository = module.get(getRepositoryToken(Application));
     questionRepository = module.get(getRepositoryToken(Question));
+    answerRepository = module.get(getRepositoryToken(Answer));
   });
 
   it('should be defined', () => {
@@ -291,8 +298,47 @@ describe('PostService', () => {
   });
 
   describe('createAnswer', () => {
-    it.todo('should fail with not found question id');
-    it.todo('should fail with not author id');
-    it.todo('should create answer');
+    const createAnswerArgs = {
+      questionId: 1,
+      text: 'test',
+    };
+    const mockPost = {
+      userId: 1,
+    };
+    it('should fail with not found question id', async () => {
+      questionRepository.findOneOrFail.mockRejectedValue(
+        new Error('not found'),
+      );
+
+      const result = await postService.createAnswer(createAnswerArgs, 1);
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should fail with not author id', async () => {
+      questionRepository.findOneOrFail.mockResolvedValue({
+        ...createAnswerArgs,
+        post: mockPost,
+      });
+
+      const result = await postService.createAnswer(createAnswerArgs, 666);
+
+      expect(result).toEqual({
+        ok: false,
+        error: "You don't have a permission",
+      });
+    });
+    it('should create answer', async () => {
+      questionRepository.findOneOrFail.mockResolvedValue({
+        ...createAnswerArgs,
+        post: mockPost,
+      });
+
+      const result = await postService.createAnswer(createAnswerArgs, 1);
+
+      expect(answerRepository.create).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        ok: true,
+      });
+    });
   });
 });
