@@ -165,4 +165,11 @@ describe('PostService', () => {
       expect(result).toEqual({ ok: true });
     });
   });
+
+  describe('toggleOpenAndClose', () => {
+    it.todo('should fail with not found post id');
+    it.todo('should fail with not author id');
+    it.todo('should toggle to close');
+    it.todo('should toggle to open');
+  });
 });
