@@ -167,9 +167,62 @@ describe('PostService', () => {
   });
 
   describe('toggleOpenAndClose', () => {
-    it.todo('should fail with not found post id');
-    it.todo('should fail with not author id');
-    it.todo('should toggle to close');
-    it.todo('should toggle to open');
+    const toggleOpenAndCloseArgs = {
+      postId: 1,
+    };
+    it('should fail with not found post id', async () => {
+      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
+
+      const result = await postService.toggleOpenAndClose(
+        toggleOpenAndCloseArgs,
+        1,
+      );
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should fail with not author id', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...toggleOpenAndCloseArgs,
+        userId: 1,
+      });
+
+      const result = await postService.toggleOpenAndClose(
+        toggleOpenAndCloseArgs,
+        666,
+      );
+
+      expect(result).toEqual({
+        ok: false,
+        error: "You don't have a permission",
+      });
+    });
+    it('should toggle to close', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...toggleOpenAndCloseArgs,
+        userId: 1,
+        isOpened: true,
+      });
+
+      const result = await postService.toggleOpenAndClose(
+        toggleOpenAndCloseArgs,
+        1,
+      );
+
+      expect(result).toEqual({ ok: true });
+    });
+    it('should toggle to open', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...toggleOpenAndCloseArgs,
+        userId: 1,
+        isOpened: false,
+      });
+
+      const result = await postService.toggleOpenAndClose(
+        toggleOpenAndCloseArgs,
+        1,
+      );
+
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
