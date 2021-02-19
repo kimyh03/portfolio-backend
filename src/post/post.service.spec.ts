@@ -289,4 +289,10 @@ describe('PostService', () => {
       expect(result).toEqual({ ok: true });
     });
   });
+
+  describe('createAnswer', () => {
+    it.todo('should fail with not found question id');
+    it.todo('should fail with not author id');
+    it.todo('should create answer');
+  });
 });
