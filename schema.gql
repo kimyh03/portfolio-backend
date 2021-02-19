@@ -155,11 +155,30 @@ type GetPostDetailOutput {
   isApplied: Boolean
 }
 
+type GetPostsOutput {
+  ok: Boolean!
+  error: String
+  posts: [Post!]
+  totalCount: Float
+  totalPage: Float
+}
+
+type ToggleLikeOutput {
+  ok: Boolean!
+  error: String
+}
+
+type ToggleOpenAndCloseOutput {
+  ok: Boolean!
+  error: String
+}
+
 type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
   getMe: User!
   getPostDetail(input: GetPostDetailInput!): GetPostDetailOutput!
+  getPosts(input: GetPostsInput!): GetPostsOutput!
 }
 
 input GetProfileInput {
@@ -170,12 +189,22 @@ input GetPostDetailInput {
   postId: Float!
 }
 
+input GetPostsInput {
+  categories: [postCategory!]!
+  rigions: [postRigion!]!
+  page: Float!
+  openOnly: Boolean!
+  searchTerm: String!
+}
+
 type Mutation {
   signUp(input: SignUpInput!): SignUpOutput!
   signIn(input: SignInInput!): SignInOutput!
   editAvatar(input: EditAvatarInput!): EditAvatarOutput!
   createPost(input: CreatePostInput!): CreatePostOutput!
   deletePost(input: DeletePostInput!): DeletePostoutput!
+  toggleOpenAndClose(input: ToggleOpenAndCloseInput!): ToggleOpenAndCloseOutput!
+  toggleLike(input: ToggleLikeInput!): ToggleLikeOutput!
 }
 
 input SignUpInput {
@@ -206,5 +235,13 @@ input CreatePostInput {
 }
 
 input DeletePostInput {
+  postId: Float!
+}
+
+input ToggleOpenAndCloseInput {
+  postId: Float!
+}
+
+input ToggleLikeInput {
   postId: Float!
 }

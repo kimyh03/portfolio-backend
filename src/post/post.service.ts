@@ -9,6 +9,7 @@ import {
   GetPostDetailOutput,
 } from './dtos/getPostDetail.dto';
 import { GetPostsInput, GetPostsOutput } from './dtos/getPosts.dto';
+import { ToggleLikeInput, ToggleLikeOutput } from './dtos/toggleLike.dto';
 import {
   ToggleOpenAndCloseInput,
   ToggleOpenAndCloseOutput,
@@ -211,6 +212,25 @@ export class PostService {
         ok: false,
         error: e.message,
       };
+    }
+  }
+
+  async toggleLike(
+    { postId }: ToggleLikeInput,
+    userId: number,
+  ): Promise<ToggleLikeOutput> {
+    try {
+      await this.posts.findOneOrFail(postId);
+      const existLike = await this.likes.findOne({ where: { postId, userId } });
+      if (existLike) {
+        await this.likes.remove(existLike);
+      } else {
+        const newLike = this.likes.create({ postId, userId });
+        await this.likes.save(newLike);
+      }
+      return { ok: true };
+    } catch (e) {
+      return { ok: true, error: e.message };
     }
   }
 }

@@ -10,10 +10,12 @@ import {
   GetPostDetailOutput,
 } from './dtos/getPostDetail.dto';
 import { GetPostsInput, GetPostsOutput } from './dtos/getPosts.dto';
+import { ToggleLikeInput, ToggleLikeOutput } from './dtos/toggleLike.dto';
 import {
   ToggleOpenAndCloseInput,
   ToggleOpenAndCloseOutput,
 } from './dtos/toggleOpenAndClose.dto';
+import { Like } from './entities/like.entity';
 import { Post } from './entities/post.entity';
 import { PostService } from './post.service';
 
@@ -63,5 +65,19 @@ export class PostResolver {
   @Query(() => GetPostsOutput)
   async getPosts(@Args('input') input: GetPostsInput): Promise<GetPostsOutput> {
     return await this.postService.getPosts(input);
+  }
+}
+
+@Resolver(() => Like)
+export class LikeResolver {
+  constructor(private readonly postService: PostService) {}
+
+  @UseGuards(Auth)
+  @Mutation(() => ToggleLikeOutput)
+  async toggleLike(
+    @Args('input') input: ToggleLikeInput,
+    @AuthUser() authUser: User,
+  ): Promise<ToggleLikeOutput> {
+    return await this.postService.toggleLike(input, authUser.id);
   }
 }
