@@ -225,4 +225,10 @@ describe('PostService', () => {
       expect(result).toEqual({ ok: true });
     });
   });
+
+  describe('toggleLike', () => {
+    it.todo('should fail with not found postId');
+    it.todo('should create new like (like)');
+    it.todo('should remove exist like (unlike)');
+  });
 });
