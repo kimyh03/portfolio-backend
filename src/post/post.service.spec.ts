@@ -4,6 +4,7 @@ import { Application } from 'src/application/entities/application.entity';
 import { Repository } from 'typeorm';
 import { Like } from './entities/like.entity';
 import { Post, postCategoryEnum, postRigionEnum } from './entities/post.entity';
+import { Question } from './entities/question.entity';
 import { PostService } from './post.service';
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const mockRepository = () => ({
@@ -22,6 +23,7 @@ describe('PostService', () => {
 
   let likeRepository: MockRepository<Like>;
   let applicationRepository: MockRepository<Application>;
+  let questionRepository: MockRepository<Question>;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -39,12 +41,17 @@ describe('PostService', () => {
           provide: getRepositoryToken(Application),
           useValue: mockRepository(),
         },
+        {
+          provide: getRepositoryToken(Question),
+          useValue: mockRepository(),
+        },
       ],
     }).compile();
     postService = module.get<PostService>(PostService);
     postRepository = module.get(getRepositoryToken(Post));
     likeRepository = module.get(getRepositoryToken(Like));
     applicationRepository = module.get(getRepositoryToken(Application));
+    questionRepository = module.get(getRepositoryToken(Question));
   });
 
   it('should be defined', () => {
@@ -262,7 +269,24 @@ describe('PostService', () => {
   });
 
   describe('createQuestion', () => {
-    it.todo('should fail witn not found post id');
-    it.todo('should create question');
+    const createQuestionArgs = {
+      postId: 1,
+      text: 'test',
+    };
+    it('should fail witn not found post id', async () => {
+      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
+
+      const result = await postService.createQuestion(createQuestionArgs, 1);
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should create question', async () => {
+      postRepository.findOneOrFail.mockResolvedValue(createQuestionArgs);
+
+      const result = await postService.createQuestion(createQuestionArgs, 1);
+
+      expect(questionRepository.create).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
