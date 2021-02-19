@@ -9,6 +9,10 @@ import {
   GetPostDetailInput,
   GetPostDetailOutput,
 } from './dtos/getPostDetail.dto';
+import {
+  ToggleOpenAndCloseInput,
+  ToggleOpenAndCloseOutput,
+} from './dtos/toggleOpenAndClose.dto';
 import { Post } from './entities/post.entity';
 import { PostService } from './post.service';
 
@@ -44,5 +48,14 @@ export class PostResolver {
     @AuthUser() authUser: User,
   ): Promise<DeletePostoutput> {
     return await this.postService.deletePost(input, authUser.id);
+  }
+
+  @UseGuards(Auth)
+  @Mutation(() => ToggleOpenAndCloseOutput)
+  async toggleOpenAndClose(
+    @Args('input') input: ToggleOpenAndCloseInput,
+    @AuthUser() authUser: User,
+  ): Promise<ToggleOpenAndCloseOutput> {
+    return await this.postService.toggleOpenAndClose(input, authUser.id);
   }
 }

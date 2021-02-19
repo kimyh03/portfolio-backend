@@ -8,6 +8,10 @@ import {
   GetPostDetailInput,
   GetPostDetailOutput,
 } from './dtos/getPostDetail.dto';
+import {
+  ToggleOpenAndCloseInput,
+  ToggleOpenAndCloseOutput,
+} from './dtos/toggleOpenAndClose.dto';
 import { Like } from './entities/like.entity';
 import { Post } from './entities/post.entity';
 
@@ -96,6 +100,32 @@ export class PostService {
         throw new Error("You don't have a permission");
       }
       await this.posts.remove(post);
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
+    }
+  }
+
+  async toggleOpenAndClose(
+    { postId }: ToggleOpenAndCloseInput,
+    userId: number,
+  ): Promise<ToggleOpenAndCloseOutput> {
+    try {
+      const post = await this.posts.findOneOrFail(postId);
+      if (post.userId !== userId) {
+        throw new Error("You don't have a permission");
+      }
+      if (post.isOpened) {
+        post.isOpened = false;
+      } else {
+        post.isOpened = true;
+      }
+      await this.posts.save(post);
       return {
         ok: true,
       };
