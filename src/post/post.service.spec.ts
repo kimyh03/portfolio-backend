@@ -227,8 +227,37 @@ describe('PostService', () => {
   });
 
   describe('toggleLike', () => {
-    it.todo('should fail with not found postId');
-    it.todo('should create new like (like)');
-    it.todo('should remove exist like (unlike)');
+    const toggleLikeArgs = {
+      postId: 1,
+    };
+    const mockLike = {
+      postId: 1,
+      userId: 1,
+    };
+    it('should fail with not found postId', async () => {
+      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
+
+      const result = await postService.toggleLike(toggleLikeArgs, 1);
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should create new like (like)', async () => {
+      postRepository.findOneOrFail.mockResolvedValue(toggleLikeArgs);
+      likeRepository.findOne.mockResolvedValue(null);
+
+      const result = await postService.toggleLike(toggleLikeArgs, 1);
+
+      expect(likeRepository.create).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+    });
+    it('should remove exist like (unlike)', async () => {
+      postRepository.findOneOrFail.mockResolvedValue(toggleLikeArgs);
+      likeRepository.findOne.mockResolvedValue(mockLike);
+
+      const result = await postService.toggleLike(toggleLikeArgs, 1);
+
+      expect(likeRepository.remove).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
