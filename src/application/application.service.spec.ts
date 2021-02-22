@@ -3,7 +3,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Post } from 'src/post/entities/post.entity';
 import { Repository } from 'typeorm';
 import { ApplicationService } from './application.service';
-import { Application } from './entities/application.entity';
+import {
+  Application,
+  applicationStatusEnum,
+} from './entities/application.entity';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const mockRepository = () => ({
@@ -86,9 +89,46 @@ describe('ApplicationService', () => {
   });
 
   describe('handelApplication', () => {
-    it.todo('should fail with not found application id');
-    it.todo('should fail with not found post id');
-    it.todo('should fail with not author id');
-    it.todo('should update status');
+    const handleApplicationArgs = {
+      applicationId: 1,
+      status: applicationStatusEnum.accepted,
+    };
+    it('should fail with not found application id', async () => {
+      applicationRepository.findOneOrFail.mockRejectedValue(
+        new Error('not found'),
+      );
+
+      const result = await service.handleApplication(handleApplicationArgs, 1);
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should fail with not found post id', async () => {
+      applicationRepository.findOneOrFail.mockResolvedValue({ id: 1 });
+      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
+
+      const result = await service.handleApplication(handleApplicationArgs, 1);
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should fail with not author id', async () => {
+      applicationRepository.findOneOrFail.mockResolvedValue({ id: 1 });
+      postRepository.findOneOrFail.mockResolvedValue({ userId: 1 });
+
+      const result = await service.handleApplication(handleApplicationArgs, 2);
+
+      expect(result).toEqual({
+        ok: false,
+        error: "You don't have a permission",
+      });
+    });
+    it('should update status', async () => {
+      applicationRepository.findOneOrFail.mockResolvedValue({ id: 1 });
+      postRepository.findOneOrFail.mockResolvedValue({ userId: 1 });
+
+      const result = await service.handleApplication(handleApplicationArgs, 1);
+
+      expect(applicationRepository.save).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
