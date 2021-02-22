@@ -84,4 +84,11 @@ describe('ApplicationService', () => {
       expect(result).toEqual({ ok: true });
     });
   });
+
+  describe('handelApplication', () => {
+    it.todo('should fail with not found application id');
+    it.todo('should fail with not found post id');
+    it.todo('should fail with not author id');
+    it.todo('should update status');
+  });
 });
