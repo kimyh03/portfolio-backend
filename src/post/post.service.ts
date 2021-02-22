@@ -68,7 +68,8 @@ export class PostService {
           'questions.user',
           'questions.answer',
           'likes',
-          'likes.user',
+          'applications',
+          'applications.user',
         ],
       });
 
