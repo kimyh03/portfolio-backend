@@ -183,6 +183,11 @@ type ToggleOpenAndCloseOutput {
   error: String
 }
 
+type HandleApplicationOutput {
+  ok: Boolean!
+  error: String
+}
+
 type ToggleApplyOutput {
   ok: Boolean!
   error: String
@@ -223,6 +228,7 @@ type Mutation {
   createQuestion(input: CreateQuestionInput!): CreateQuestionOutput!
   createAnswer(input: CreateAnswerInput!): CreateAnswerOutput!
   toggleApply(input: ToggleApplyInput!): ToggleApplyOutput!
+  handleApplication(input: HandleApplicationInput!): HandleApplicationOutput!
 }
 
 input SignUpInput {
@@ -276,4 +282,15 @@ input CreateAnswerInput {
 
 input ToggleApplyInput {
   postId: Float!
+}
+
+input HandleApplicationInput {
+  applicationId: Float!
+  status: applicationStatus!
+}
+
+enum applicationStatus {
+  pendding
+  accepted
+  rejected
 }

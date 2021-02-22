@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/post/entities/post.entity';
 import { Repository } from 'typeorm';
+import {
+  HandleApplicationInput,
+  HandleApplicationOutput,
+} from './dtos/handleApplication.dto';
 import { ToggleApplyInput, ToggleApplyOutput } from './dtos/toggleApply.dto';
 import { Application } from './entities/application.entity';
 
@@ -40,6 +44,29 @@ export class ApplicationService {
       return { ok: true };
     } catch (e) {
       return { ok: false, error: e.message };
+    }
+  }
+
+  async handleApplication(
+    { applicationId, status }: HandleApplicationInput,
+    userId: number,
+  ): Promise<HandleApplicationOutput> {
+    try {
+      const application = await this.applications.findOneOrFail(applicationId);
+      const post = await this.posts.findOneOrFail(application.postId);
+      if (post.userId !== userId) {
+        throw new Error("You don't have a permission");
+      }
+      application.status = status;
+      await this.applications.save(application);
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e.message,
+      };
     }
   }
 }
