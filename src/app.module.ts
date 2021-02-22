@@ -54,7 +54,7 @@ import { S3Module } from './shared/S3/S3.module';
       autoSchemaFile: 'schema.gql',
     }),
     UserModule,
-    AuthModule.forRoot({ jwtSecretKey: 'secret' }),
+    AuthModule.forRoot({ jwtSecretKey: process.env.JWT_SECRET }),
     PostModule,
     ApplicationModule,
     CertificateModule,
