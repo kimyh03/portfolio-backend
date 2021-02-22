@@ -6,13 +6,13 @@ import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 
 // 봉사활동 모집 공고에 대한 참가 신청
 
-export enum applicationStatus {
+export enum applicationStatusEnum {
   pendding = 'pendding',
   accepted = 'accepted',
   rejected = 'rejected',
 }
 
-registerEnumType(applicationStatus, { name: 'applicationStatus' });
+registerEnumType(applicationStatusEnum, { name: 'applicationStatus' });
 
 @ObjectType()
 @Entity('Application')
@@ -21,10 +21,10 @@ export class Application extends CoreEntity {
   @Field()
   @Column({
     type: 'enum',
-    enum: applicationStatus,
-    default: applicationStatus.pendding,
+    enum: applicationStatusEnum,
+    default: applicationStatusEnum.pendding,
   })
-  status: applicationStatus;
+  status: applicationStatusEnum;
 
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.applications, { onDelete: 'CASCADE' })
