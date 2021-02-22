@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
+import { AWS_ACCESS_KEY, AWS_SECRET_ACCESS_KEY } from '../constants';
 
 @Injectable()
 export class S3Service {
   constructor(private readonly configService: ConfigService) {}
   getS3() {
     return new S3({
-      accessKeyId: this.configService.get('AWS_ACCESS_KEY'),
-      secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
+      accessKeyId: this.configService.get(AWS_ACCESS_KEY),
+      secretAccessKey: this.configService.get(AWS_SECRET_ACCESS_KEY),
       region: 'ap-northeast-2',
     });
   }
