@@ -183,6 +183,11 @@ type ToggleOpenAndCloseOutput {
   error: String
 }
 
+type ToggleApplyOutput {
+  ok: Boolean!
+  error: String
+}
+
 type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
@@ -217,6 +222,7 @@ type Mutation {
   toggleLike(input: ToggleLikeInput!): ToggleLikeOutput!
   createQuestion(input: CreateQuestionInput!): CreateQuestionOutput!
   createAnswer(input: CreateAnswerInput!): CreateAnswerOutput!
+  toggleApply(input: ToggleApplyInput!): ToggleApplyOutput!
 }
 
 input SignUpInput {
@@ -266,4 +272,8 @@ input CreateQuestionInput {
 input CreateAnswerInput {
   questionId: Float!
   text: String!
+}
+
+input ToggleApplyInput {
+  postId: Float!
 }
