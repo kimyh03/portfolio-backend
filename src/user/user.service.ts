@@ -101,29 +101,29 @@ export class UserService {
     { userId }: GetProfileInput,
   ): Promise<GetprofileOutput> {
     try {
-      const user = await this.users.findOneOrFail({
-        where: { id: userId },
-        relations: ['posts', 'certificates'],
-      });
-      let likes: Like[];
-      let applications: Application[];
+      let user: User;
       if (isSelf) {
-        likes = await this.likes.find({
-          where: { userId },
-          relations: ['post'],
+        user = await this.users.findOneOrFail({
+          where: { id: userId },
+          relations: [
+            'posts',
+            'certificates',
+            'likes',
+            'likes.post',
+            'applications',
+            'applications.post',
+          ],
         });
-        applications = await this.applications.find({
-          where: { userId },
-          relations: ['post'],
+      } else {
+        user = await this.users.findOneOrFail({
+          where: { id: userId },
+          relations: ['posts', 'certificates'],
         });
       }
       return {
         ok: true,
-        error: null,
         isSelf,
         user,
-        likes,
-        applications,
       };
     } catch (e) {
       return {

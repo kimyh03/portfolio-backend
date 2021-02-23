@@ -109,9 +109,6 @@ describe('UserService', () => {
         ok: true,
         isSelf: false,
         user: testUserArgs,
-        error: null,
-        applications: undefined,
-        likes: undefined,
       });
     });
     it('should get my profile', async () => {
@@ -125,9 +122,6 @@ describe('UserService', () => {
         ok: true,
         isSelf: true,
         user: testUserArgs,
-        error: null,
-        applications: [],
-        likes: [],
       });
     });
   });
