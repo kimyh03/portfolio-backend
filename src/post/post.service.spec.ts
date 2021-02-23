@@ -98,6 +98,12 @@ describe('PostService', () => {
       expect(postRepository.save).toHaveBeenCalledTimes(1);
       expect(result).toEqual({ ok: true });
     });
+    it('should fail on exception', async () => {
+      postRepository.save.mockRejectedValue(new Error('error'));
+      const result = await postService.createPost(createPostArgs, testUser.id);
+
+      expect(result).toEqual({ ok: false, error: 'error' });
+    });
   });
 
   describe('getPostDetail', () => {

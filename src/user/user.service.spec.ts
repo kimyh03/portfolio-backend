@@ -228,7 +228,7 @@ describe('UserService', () => {
     });
   });
 
-  describe('findOneById', async () => {
+  describe('findOneById', () => {
     const findOneByIdArgs = {
       id: 1,
     };
