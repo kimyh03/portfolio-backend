@@ -65,17 +65,11 @@ export class UserService {
     try {
       const user = await this.users.findOne({ where: { email } });
       if (!user) {
-        return {
-          ok: false,
-          error: '로그인 정보를 확인하세요',
-        };
+        throw new Error('로그인 정보를 확인하세요.');
       }
       const compared = await bcrypt.compare(password, user.password);
       if (!compared) {
-        return {
-          ok: false,
-          error: '로그인 정보를 확인하세요',
-        };
+        throw new Error('로그인 정보를 확인하세요.');
       }
       const token = this.authService.signToken(user.id);
       return {
