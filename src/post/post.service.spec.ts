@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
+import { Certificate } from 'src/certificate/entities/certificate.entity';
 import { Repository } from 'typeorm';
 import { Answer } from './entities/answer.entity';
 import { Like } from './entities/like.entity';
@@ -26,6 +27,7 @@ describe('PostService', () => {
   let applicationRepository: MockRepository<Application>;
   let questionRepository: MockRepository<Question>;
   let answerRepository: MockRepository<Answer>;
+  let certificatesRepository: MockRepository<Certificate>;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -51,6 +53,10 @@ describe('PostService', () => {
           provide: getRepositoryToken(Answer),
           useValue: mockRepository(),
         },
+        {
+          provide: getRepositoryToken(Certificate),
+          useValue: mockRepository(),
+        },
       ],
     }).compile();
     postService = module.get<PostService>(PostService);
@@ -59,6 +65,7 @@ describe('PostService', () => {
     applicationRepository = module.get(getRepositoryToken(Application));
     questionRepository = module.get(getRepositoryToken(Question));
     answerRepository = module.get(getRepositoryToken(Answer));
+    certificatesRepository = module.get(getRepositoryToken(Certificate));
   });
 
   it('should be defined', () => {
@@ -340,5 +347,14 @@ describe('PostService', () => {
         ok: true,
       });
     });
+  });
+
+  describe('completePost', () => {
+    it.todo('should fail with not found post id');
+    it.todo('should fail with not author id');
+    it.todo(
+      'should complete post (create certificates, remove applications, set isOpend false and isCompleted true)',
+    );
+    it.todo('');
   });
 });
