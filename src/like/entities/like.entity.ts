@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/shared/core.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
-import { Post } from './post.entity';
+import { Post } from '../../post/entities/post.entity';
 
 // 봉사활동 모집 공고의 좋아요&북마크
 

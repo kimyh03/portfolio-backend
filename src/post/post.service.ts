@@ -4,30 +4,22 @@ import {
   Application,
   applicationStatusEnum,
 } from 'src/application/entities/application.entity';
-import { Certificate } from 'src/certificate/entities/certificate.entity';
+import { Certificate } from 'src/post/entities/certificate.entity';
 import { Brackets, Repository } from 'typeorm';
 import { CompletePostInput, CompletePostOutput } from './dtos/completePost.dto';
-import { CreateAnswerInput, CreateAnswerOutput } from './dtos/createAnswer.dto';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
-import {
-  CreateQuestionInput,
-  CreateQuestionOutput,
-} from './dtos/createQuestion.dto';
 import { DeletePostInput, DeletePostoutput } from './dtos/deletePost.dto';
 import {
   GetPostDetailInput,
   GetPostDetailOutput,
 } from './dtos/getPostDetail.dto';
 import { GetPostsInput, GetPostsOutput } from './dtos/getPosts.dto';
-import { ToggleLikeInput, ToggleLikeOutput } from './dtos/toggleLike.dto';
 import {
   ToggleOpenAndCloseInput,
   ToggleOpenAndCloseOutput,
 } from './dtos/toggleOpenAndClose.dto';
-import { Answer } from './entities/answer.entity';
-import { Like } from './entities/like.entity';
+import { Like } from '../like/entities/like.entity';
 import { Post } from './entities/post.entity';
-import { Question } from './entities/question.entity';
 
 @Injectable()
 export class PostService {
@@ -37,10 +29,6 @@ export class PostService {
     private readonly applications: Repository<Application>,
     @InjectRepository(Like)
     private readonly likes: Repository<Like>,
-    @InjectRepository(Question)
-    private readonly questions: Repository<Question>,
-    @InjectRepository(Answer)
-    private readonly answers: Repository<Answer>,
     @InjectRepository(Certificate)
     private readonly certificates: Repository<Certificate>,
   ) {}
@@ -265,68 +253,6 @@ export class PostService {
       return { ok: true };
     } catch (e) {
       return { ok: false, error: e.message };
-    }
-  }
-
-  async toggleLike(
-    { postId }: ToggleLikeInput,
-    userId: number,
-  ): Promise<ToggleLikeOutput> {
-    try {
-      await this.posts.findOneOrFail(postId);
-      const existLike = await this.likes.findOne({ where: { postId, userId } });
-      if (existLike) {
-        await this.likes.remove(existLike);
-      } else {
-        const newLike = this.likes.create({ postId, userId });
-        await this.likes.save(newLike);
-      }
-      return { ok: true };
-    } catch (e) {
-      return { ok: false, error: e.message };
-    }
-  }
-
-  async createQuestion(
-    { postId, text }: CreateQuestionInput,
-    userId: number,
-  ): Promise<CreateQuestionOutput> {
-    try {
-      await this.posts.findOneOrFail(postId);
-      const newQuestion = this.questions.create({ postId, userId, text });
-      await this.questions.save(newQuestion);
-      return {
-        ok: true,
-      };
-    } catch (e) {
-      return {
-        ok: false,
-        error: e.message,
-      };
-    }
-  }
-
-  async createAnswer(
-    { questionId, text }: CreateAnswerInput,
-    userId: number,
-  ): Promise<CreateAnswerOutput> {
-    try {
-      const question = await this.questions.findOneOrFail(questionId, {
-        relations: ['post'],
-      });
-      if (question.post.userId !== userId) {
-        throw new Error("You don't have a permission");
-      }
-      const newAnswer = this.answers.create({ questionId, text });
-      await this.answers.save(newAnswer);
-      return {
-        ok: true,
-      };
-    } catch (e) {
-      return {
-        ok: false,
-        error: e.message,
-      };
     }
   }
 }

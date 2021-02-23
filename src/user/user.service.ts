@@ -9,7 +9,7 @@ import { SignInInput, SignInOutput } from './dtos/signIn.dto';
 import { ConfigService } from '@nestjs/config';
 import { HASH_ROUNDS } from 'src/shared/constants';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
-import { Like } from 'src/post/entities/like.entity';
+import { Like } from 'src/like/entities/like.entity';
 import { Application } from 'src/application/entities/application.entity';
 import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
 import { S3Service } from 'src/shared/S3/S3.service';

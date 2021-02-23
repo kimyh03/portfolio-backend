@@ -3,7 +3,7 @@ import { CoreEntity } from 'src/shared/core.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToOne, RelationId } from 'typeorm';
 import { Answer } from './answer.entity';
-import { Post } from './post.entity';
+import { Post } from '../../post/entities/post.entity';
 
 // 봉사활동 모집 공고에 대한 질문
 

@@ -3,8 +3,8 @@ import { Application } from 'src/application/entities/application.entity';
 import { CoreEntity } from 'src/shared/core.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
-import { Question } from './question.entity';
-import { Like } from './like.entity';
+import { Question } from '../../comment/entities/question.entity';
+import { Like } from '../../like/entities/like.entity';
 
 export enum postCategoryEnum {
   environment = 'environment',

@@ -81,7 +81,9 @@
     "collectCoverageFrom": [
       "**/post.service.ts",
       "**/user.service.ts",
-      "**/application.service.ts"
+      "**/application.service.ts",
+      "**/like.service.ts",
+      "**/comment.service.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

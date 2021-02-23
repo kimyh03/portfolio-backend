@@ -4,12 +4,12 @@ import {
   Application,
   applicationStatusEnum,
 } from 'src/application/entities/application.entity';
-import { Certificate } from 'src/certificate/entities/certificate.entity';
+import { Certificate } from 'src/post/entities/certificate.entity';
 import { Repository } from 'typeorm';
-import { Answer } from './entities/answer.entity';
-import { Like } from './entities/like.entity';
+import { Answer } from '../comment/entities/answer.entity';
+import { Like } from '../like/entities/like.entity';
 import { Post, postCategoryEnum, postRigionEnum } from './entities/post.entity';
-import { Question } from './entities/question.entity';
+import { Question } from '../comment/entities/question.entity';
 import { PostService } from './post.service';
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const mockRepository = () => ({
@@ -28,8 +28,6 @@ describe('PostService', () => {
 
   let likeRepository: MockRepository<Like>;
   let applicationRepository: MockRepository<Application>;
-  let questionRepository: MockRepository<Question>;
-  let answerRepository: MockRepository<Answer>;
   let certificatesRepository: MockRepository<Certificate>;
 
   beforeEach(async () => {
@@ -66,8 +64,6 @@ describe('PostService', () => {
     postRepository = module.get(getRepositoryToken(Post));
     likeRepository = module.get(getRepositoryToken(Like));
     applicationRepository = module.get(getRepositoryToken(Application));
-    questionRepository = module.get(getRepositoryToken(Question));
-    answerRepository = module.get(getRepositoryToken(Answer));
     certificatesRepository = module.get(getRepositoryToken(Certificate));
   });
 
@@ -247,108 +243,6 @@ describe('PostService', () => {
       );
 
       expect(result).toEqual({ ok: true });
-    });
-  });
-
-  describe('toggleLike', () => {
-    const toggleLikeArgs = {
-      postId: 1,
-    };
-    const mockLike = {
-      postId: 1,
-      userId: 1,
-    };
-    it('should fail with not found postId', async () => {
-      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
-
-      const result = await postService.toggleLike(toggleLikeArgs, 1);
-
-      expect(result).toEqual({ ok: false, error: 'not found' });
-    });
-    it('should create new like (like)', async () => {
-      postRepository.findOneOrFail.mockResolvedValue(toggleLikeArgs);
-      likeRepository.findOne.mockResolvedValue(null);
-
-      const result = await postService.toggleLike(toggleLikeArgs, 1);
-
-      expect(likeRepository.create).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({ ok: true });
-    });
-    it('should remove exist like (unlike)', async () => {
-      postRepository.findOneOrFail.mockResolvedValue(toggleLikeArgs);
-      likeRepository.findOne.mockResolvedValue(mockLike);
-
-      const result = await postService.toggleLike(toggleLikeArgs, 1);
-
-      expect(likeRepository.remove).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({ ok: true });
-    });
-  });
-
-  describe('createQuestion', () => {
-    const createQuestionArgs = {
-      postId: 1,
-      text: 'test',
-    };
-    it('should fail witn not found post id', async () => {
-      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
-
-      const result = await postService.createQuestion(createQuestionArgs, 1);
-
-      expect(result).toEqual({ ok: false, error: 'not found' });
-    });
-    it('should create question', async () => {
-      postRepository.findOneOrFail.mockResolvedValue(createQuestionArgs);
-
-      const result = await postService.createQuestion(createQuestionArgs, 1);
-
-      expect(questionRepository.create).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({ ok: true });
-    });
-  });
-
-  describe('createAnswer', () => {
-    const createAnswerArgs = {
-      questionId: 1,
-      text: 'test',
-    };
-    const mockPost = {
-      userId: 1,
-    };
-    it('should fail with not found question id', async () => {
-      questionRepository.findOneOrFail.mockRejectedValue(
-        new Error('not found'),
-      );
-
-      const result = await postService.createAnswer(createAnswerArgs, 1);
-
-      expect(result).toEqual({ ok: false, error: 'not found' });
-    });
-    it('should fail with not author id', async () => {
-      questionRepository.findOneOrFail.mockResolvedValue({
-        ...createAnswerArgs,
-        post: mockPost,
-      });
-
-      const result = await postService.createAnswer(createAnswerArgs, 666);
-
-      expect(result).toEqual({
-        ok: false,
-        error: "You don't have a permission",
-      });
-    });
-    it('should create answer', async () => {
-      questionRepository.findOneOrFail.mockResolvedValue({
-        ...createAnswerArgs,
-        post: mockPost,
-      });
-
-      const result = await postService.createAnswer(createAnswerArgs, 1);
-
-      expect(answerRepository.create).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({
-        ok: true,
-      });
     });
   });
 

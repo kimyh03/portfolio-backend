@@ -10,16 +10,15 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './shared/auth/auth.module';
 import { PostModule } from './post/post.module';
 import { ApplicationModule } from './application/application.module';
-import { CertificateModule } from './certificate/certificate.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { User } from './user/entities/user.entity';
 import { Post } from './post/entities/post.entity';
-import { Like } from './post/entities/like.entity';
-import { Answer } from './post/entities/answer.entity';
-import { Question } from './post/entities/question.entity';
+import { Like } from './like/entities/like.entity';
+import { Answer } from './comment/entities/answer.entity';
+import { Question } from './comment/entities/question.entity';
 import { Application } from './application/entities/application.entity';
-import { Certificate } from './certificate/entities/certificate.entity';
+import { Certificate } from './post/entities/certificate.entity';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtMiddleware } from './shared/auth/auth.middleware';
@@ -57,7 +56,6 @@ import { S3Module } from './shared/S3/S3.module';
     AuthModule.forRoot({ jwtSecretKey: process.env.JWT_SECRET }),
     PostModule,
     ApplicationModule,
-    CertificateModule,
     S3Module,
   ],
   controllers: [AppController],

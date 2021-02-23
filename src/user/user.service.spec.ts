@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Application } from 'src/application/entities/application.entity';
 import { AuthService } from 'src/shared/auth/auth.service';
-import { Like } from 'src/post/entities/like.entity';
+import { Like } from 'src/like/entities/like.entity';
 import { S3Service } from 'src/shared/S3/S3.service';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';

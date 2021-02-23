@@ -141,17 +141,7 @@ type CompletePostOutput {
   error: String
 }
 
-type CreateAnswerOutput {
-  ok: Boolean!
-  error: String
-}
-
 type CreatePostOutput {
-  ok: Boolean!
-  error: String
-}
-
-type CreateQuestionOutput {
   ok: Boolean!
   error: String
 }
@@ -176,11 +166,6 @@ type GetPostsOutput {
   posts: [Post!]
   totalCount: Float
   totalPage: Float
-}
-
-type ToggleLikeOutput {
-  ok: Boolean!
-  error: String
 }
 
 type ToggleOpenAndCloseOutput {
@@ -230,9 +215,6 @@ type Mutation {
   deletePost(input: DeletePostInput!): DeletePostoutput!
   toggleOpenAndClose(input: ToggleOpenAndCloseInput!): ToggleOpenAndCloseOutput!
   completePost(input: CompletePostInput!): CompletePostOutput!
-  toggleLike(input: ToggleLikeInput!): ToggleLikeOutput!
-  createQuestion(input: CreateQuestionInput!): CreateQuestionOutput!
-  createAnswer(input: CreateAnswerInput!): CreateAnswerOutput!
   toggleApply(input: ToggleApplyInput!): ToggleApplyOutput!
   handleApplication(input: HandleApplicationInput!): HandleApplicationOutput!
 }
@@ -274,20 +256,6 @@ input ToggleOpenAndCloseInput {
 
 input CompletePostInput {
   postId: Float!
-}
-
-input ToggleLikeInput {
-  postId: Float!
-}
-
-input CreateQuestionInput {
-  postId: Float!
-  text: String!
-}
-
-input CreateAnswerInput {
-  questionId: Float!
-  text: String!
 }
 
 input ToggleApplyInput {

@@ -1,8 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Application } from 'src/application/entities/application.entity';
-import { Certificate } from 'src/certificate/entities/certificate.entity';
-import { Question } from 'src/post/entities/question.entity';
-import { Like } from 'src/post/entities/like.entity';
+import { Certificate } from 'src/post/entities/certificate.entity';
+import { Question } from 'src/comment/entities/question.entity';
+import { Like } from 'src/like/entities/like.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { CoreEntity } from 'src/shared/core.entity';
 import { Column, Entity, OneToMany } from 'typeorm';

@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Application } from 'src/application/entities/application.entity';
-import { Like } from 'src/post/entities/like.entity';
+import { Like } from 'src/like/entities/like.entity';
 import { CoreOutput } from 'src/shared/core.dto';
 import { User } from '../entities/user.entity';
 
