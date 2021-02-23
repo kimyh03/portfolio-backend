@@ -1,6 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Application } from 'src/application/entities/application.entity';
+import {
+  Application,
+  applicationStatusEnum,
+} from 'src/application/entities/application.entity';
 import { Certificate } from 'src/certificate/entities/certificate.entity';
 import { Repository } from 'typeorm';
 import { Answer } from './entities/answer.entity';
@@ -350,11 +353,44 @@ describe('PostService', () => {
   });
 
   describe('completePost', () => {
-    it.todo('should fail with not found post id');
-    it.todo('should fail with not author id');
-    it.todo(
-      'should complete post (create certificates, remove applications, set isOpend false and isCompleted true)',
-    );
-    it.todo('');
+    const completePostArgs = {
+      postId: 1,
+    };
+    it('should fail with not found post id', async () => {
+      postRepository.findOneOrFail.mockRejectedValue(new Error('not found'));
+
+      const result = await postService.completePost(completePostArgs, 1);
+
+      expect(result).toEqual({ ok: false, error: 'not found' });
+    });
+    it('should fail with not author id', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...completePostArgs,
+        userId: 1,
+      });
+
+      const result = await postService.completePost(completePostArgs, 9);
+
+      expect(result).toEqual({
+        ok: false,
+        error: "You don't have a permission",
+      });
+    });
+    it('should complete post (create certificates, remove applications, set isOpend false and isCompleted true)', async () => {
+      postRepository.findOneOrFail.mockResolvedValue({
+        ...completePostArgs,
+        userId: 1,
+        applications: [
+          { id: 1, status: applicationStatusEnum.accepted, userId: 2 },
+        ],
+      });
+
+      const result = await postService.completePost(completePostArgs, 1);
+
+      expect(certificatesRepository.create).toHaveBeenCalledTimes(1);
+      expect(certificatesRepository.save).toHaveBeenCalledTimes(1);
+      expect(applicationRepository.remove).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
