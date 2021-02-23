@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Application } from 'src/application/entities/application.entity';
+import {
+  Application,
+  applicationStatusEnum,
+} from 'src/application/entities/application.entity';
+import { Certificate } from 'src/certificate/entities/certificate.entity';
 import { Brackets, Repository } from 'typeorm';
+import { CompletePostInput, CompletePostOutput } from './dtos/completePost.dto';
 import { CreateAnswerInput, CreateAnswerOutput } from './dtos/createAnswer.dto';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import {
@@ -36,6 +41,8 @@ export class PostService {
     private readonly questions: Repository<Question>,
     @InjectRepository(Answer)
     private readonly answers: Repository<Answer>,
+    @InjectRepository(Certificate)
+    private readonly certificates: Repository<Certificate>,
   ) {}
 
   async createPost(
@@ -224,6 +231,40 @@ export class PostService {
         ok: false,
         error: e.message,
       };
+    }
+  }
+
+  async completePost(
+    { postId }: CompletePostInput,
+    userId: number,
+  ): Promise<CompletePostOutput> {
+    try {
+      const post = await this.posts.findOneOrFail(postId, {
+        relations: ['applications'],
+      });
+      if (post.userId !== userId) {
+        throw new Error("You don't have a permission");
+      }
+      post.applications.forEach(async (application) => {
+        if (application.status === applicationStatusEnum.accepted) {
+          await this.certificates.save(
+            this.certificates.create({
+              title: post.title,
+              host: post.host,
+              recognizedHours: post.recognizedHours,
+              date: post.date,
+              userId: application.userId,
+            }),
+          );
+        }
+        await this.applications.remove(application);
+      });
+      post.isOpened = false;
+      post.isCompleted = true;
+      await this.posts.save(post);
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.message };
     }
   }
 

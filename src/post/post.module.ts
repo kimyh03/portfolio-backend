@@ -12,10 +12,18 @@ import { Application } from 'src/application/entities/application.entity';
 import { Like } from './entities/like.entity';
 import { Question } from './entities/question.entity';
 import { Answer } from './entities/answer.entity';
+import { Certificate } from 'src/certificate/entities/certificate.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Post, Application, Like, Question, Answer]),
+    TypeOrmModule.forFeature([
+      Post,
+      Application,
+      Like,
+      Question,
+      Answer,
+      Certificate,
+    ]),
   ],
   providers: [
     PostService,

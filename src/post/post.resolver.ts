@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Auth } from 'src/shared/auth/auth.guard';
 import { AuthUser } from 'src/shared/auth/authUser.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { CompletePostInput, CompletePostOutput } from './dtos/completePost.dto';
 import { CreateAnswerInput, CreateAnswerOutput } from './dtos/createAnswer.dto';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import {
@@ -72,6 +73,15 @@ export class PostResolver {
   @Query(() => GetPostsOutput)
   async getPosts(@Args('input') input: GetPostsInput): Promise<GetPostsOutput> {
     return await this.postService.getPosts(input);
+  }
+
+  @UseGuards(Auth)
+  @Mutation(() => CompletePostOutput)
+  async completePost(
+    @Args('input') input: CompletePostInput,
+    @AuthUser() authUser: User,
+  ): Promise<CompletePostOutput> {
+    return await this.postService.completePost(input, authUser.id);
   }
 }
 
