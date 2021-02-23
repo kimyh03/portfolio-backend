@@ -35,11 +35,9 @@ export class UserService {
   }: SignUpInput): Promise<SignUpOutput> {
     try {
       const user = await this.users.findOne({ where: { email } });
-      if (user)
-        return {
-          ok: false,
-          error: '이미 가입된 정보입니다.',
-        };
+      if (user) {
+        throw new Error('이미 가입된 정보입니다.');
+      }
       const hashedPassword = await bcrypt.hash(
         password,
         +this.configService.get(HASH_ROUNDS),
