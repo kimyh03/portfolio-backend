@@ -21,7 +21,7 @@ const mockRepository = () => ({
 });
 
 const mockAuthService = () => ({
-  signToken: jest.fn(),
+  signToken: jest.fn(() => 'token'),
 });
 
 const mockConfigService = () => ({
@@ -165,6 +165,32 @@ describe('UserService', () => {
       expect(result).toEqual({
         ok: true,
       });
+    });
+  });
+
+  describe('signUp', () => {
+    const signUpArgs = {
+      email: 'test@test.com',
+      password: 'password',
+      username: 'test',
+    };
+    it('should fail with exist email', async () => {
+      userRepository.findOne.mockResolvedValue(signUpArgs);
+
+      const result = await userService.signUp(signUpArgs);
+
+      expect(result).toEqual({ ok: false, error: '이미 가입된 정보입니다.' });
+    });
+    it('should sign up (create user)', async () => {
+      userRepository.findOne.mockResolvedValue(null);
+      userRepository.create.mockResolvedValue({ ...signUpArgs, id: 1 });
+
+      const { ok, token } = await userService.signUp(signUpArgs);
+
+      expect(userRepository.create).toHaveBeenCalledTimes(1);
+      expect(userRepository.save).toHaveBeenCalledTimes(1);
+      expect(ok).toBe(true);
+      expect(token).toBe('token');
     });
   });
 });
