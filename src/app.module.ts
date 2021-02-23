@@ -23,6 +23,8 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtMiddleware } from './shared/auth/auth.middleware';
 import { S3Module } from './shared/S3/S3.module';
+import { LikeModule } from './like/like.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -57,6 +59,8 @@ import { S3Module } from './shared/S3/S3.module';
     PostModule,
     ApplicationModule,
     S3Module,
+    LikeModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

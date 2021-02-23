@@ -183,6 +183,21 @@ type ToggleApplyOutput {
   error: String
 }
 
+type ToggleLikeOutput {
+  ok: Boolean!
+  error: String
+}
+
+type CreateAnswerOutput {
+  ok: Boolean!
+  error: String
+}
+
+type CreateQuestionOutput {
+  ok: Boolean!
+  error: String
+}
+
 type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
@@ -217,6 +232,9 @@ type Mutation {
   completePost(input: CompletePostInput!): CompletePostOutput!
   toggleApply(input: ToggleApplyInput!): ToggleApplyOutput!
   handleApplication(input: HandleApplicationInput!): HandleApplicationOutput!
+  toggleLike(input: ToggleLikeInput!): ToggleLikeOutput!
+  createQuestion(input: CreateQuestionInput!): CreateQuestionOutput!
+  createAnswer(input: CreateAnswerInput!): CreateAnswerOutput!
 }
 
 input SignUpInput {
@@ -271,4 +289,18 @@ enum applicationStatus {
   pendding
   accepted
   rejected
+}
+
+input ToggleLikeInput {
+  postId: Float!
+}
+
+input CreateQuestionInput {
+  postId: Float!
+  text: String!
+}
+
+input CreateAnswerInput {
+  questionId: Float!
+  text: String!
 }
