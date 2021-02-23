@@ -8,6 +8,7 @@ import { S3Service } from 'src/shared/S3/S3.service';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import * as bcrypt from 'bcrypt';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -31,6 +32,8 @@ const mockConfigService = () => ({
 const mockS3Service = () => ({
   delete: jest.fn(),
 });
+jest.mock('bcrypt');
+const { compare } = bcrypt as jest.Mocked<typeof import('bcrypt')>;
 
 describe('UserService', () => {
   let userService: UserService;
@@ -41,6 +44,7 @@ describe('UserService', () => {
   let likeRepository: MockRepository<Like>;
   let applicationRepository: MockRepository<Application>;
   let s3Service: S3Service;
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -191,6 +195,49 @@ describe('UserService', () => {
       expect(userRepository.save).toHaveBeenCalledTimes(1);
       expect(ok).toBe(true);
       expect(token).toBe('token');
+    });
+  });
+
+  describe('signIn', () => {
+    const signInArgs = {
+      email: 'test@test.com',
+      password: 'password',
+    };
+    it('should fail with not found email', async () => {
+      userRepository.findOne.mockResolvedValue(null);
+
+      const result = await userService.signIn(signInArgs);
+
+      expect(result).toEqual({ ok: false, error: '로그인 정보를 확인하세요.' });
+    });
+    it('should fail with wrong password', async () => {
+      userRepository.findOne.mockResolvedValue(signInArgs);
+      compare.mockResolvedValue(false);
+
+      const result = await userService.signIn(signInArgs);
+
+      expect(result).toEqual({ ok: false, error: '로그인 정보를 확인하세요.' });
+    });
+    it('should log in', async () => {
+      userRepository.findOne.mockResolvedValue(signInArgs);
+      compare.mockResolvedValue(true);
+
+      const result = await userService.signIn(signInArgs);
+
+      expect(result).toEqual({ ok: true, token: 'token' });
+    });
+  });
+
+  describe('findOneById', async () => {
+    const findOneByIdArgs = {
+      id: 1,
+    };
+    it('shoulf find one', async () => {
+      userRepository.findOne.mockResolvedValue(findOneByIdArgs);
+
+      const result = await userService.findOneById(1);
+
+      expect(result).toBe(findOneByIdArgs);
     });
   });
 });
