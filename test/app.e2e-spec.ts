@@ -488,4 +488,46 @@ describe('AppController (e2e)', () => {
         });
     });
   });
+
+  describe('getPosts', () => {
+    it('should get posts', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+          {
+            getPosts(args:{
+              page:1, 
+              openOnly:false, 
+              categories:[], 
+              rigions:[], 
+              searchTerm:""}){
+            ok
+            error
+            posts{
+              id
+            }
+            totalCount
+            totalPage
+          }
+        }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                getPosts: { ok, error, posts, totalCount, totalPage },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+          expect(posts).toEqual(expect.any(Array));
+          expect(totalCount).toBe(1);
+          expect(totalPage).toBe(1);
+        });
+    });
+  });
 });
