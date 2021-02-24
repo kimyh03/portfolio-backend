@@ -10,7 +10,10 @@ import {
 } from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Question } from 'src/comment/entities/question.entity';
-import { Application } from 'src/application/entities/application.entity';
+import {
+  Application,
+  applicationStatusEnum,
+} from 'src/application/entities/application.entity';
 import { Like } from 'src/like/entities/like.entity';
 import { Certificate } from 'src/post/entities/certificate.entity';
 import { Answer } from 'src/comment/entities/answer.entity';
@@ -831,6 +834,87 @@ describe('AppController (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.errors[0].message).toBe('Forbidden resource');
+        });
+    });
+  });
+
+  describe('handleApplication', () => {
+    it('should set application status', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{
+            handleApplication(input:{applicationId:1, status:${applicationStatusEnum.accepted}}){
+              ok
+              error
+            }
+          }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                handleApplication: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should fail with notFound applicationId', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{
+            handleApplication(input:{applicationId:666, status:${applicationStatusEnum.accepted}}){
+              ok
+              error
+            }
+          }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                handleApplication: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+    it('should fail with not author jwt', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${fakeJwt}` })
+        .send({
+          query: `
+          mutation{
+            handleApplication(input:{applicationId:1, status:${applicationStatusEnum.accepted}}){
+              ok
+              error
+            }
+          }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                handleApplication: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
         });
     });
   });
