@@ -761,4 +761,77 @@ describe('AppController (e2e)', () => {
         });
     });
   });
+
+  describe('toggleApply', () => {
+    let post: Post;
+    beforeAll(async () => {
+      post = await _post.findOne(1);
+    });
+    it('should toggle apply', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{toggleApply(input:{postId:${post.id}}){
+            ok
+            error
+          }}
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                toggleApply: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should fail with notFound postId', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{toggleApply(input:{postId:666}){
+            ok
+            error
+          }}
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                toggleApply: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+    it('should fail without jwt', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+          mutation{toggleApply(input:{postId:${post.id}}){
+            ok
+            error
+          }}
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.errors[0].message).toBe('Forbidden resource');
+        });
+    });
+  });
 });
