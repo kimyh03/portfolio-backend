@@ -9,14 +9,7 @@ import {
   postRigionEnum,
 } from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Question } from 'src/comment/entities/question.entity';
-import {
-  Application,
-  applicationStatusEnum,
-} from 'src/application/entities/application.entity';
-import { Like } from 'src/like/entities/like.entity';
-import { Certificate } from 'src/post/entities/certificate.entity';
-import { Answer } from 'src/comment/entities/answer.entity';
+import { applicationStatusEnum } from 'src/application/entities/application.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 const GRAPHQL_ENDPOINT = '/graphql';
@@ -25,11 +18,6 @@ let app: INestApplication;
 
 let _user: Repository<User>;
 let _post: Repository<Post>;
-let _question: Repository<Question>;
-let _answer: Repository<Answer>;
-let _application: Repository<Application>;
-let _like: Repository<Like>;
-let _certificate: Repository<Certificate>;
 
 const testUser = {
   username: 'Hoony',
@@ -58,11 +46,6 @@ describe('AppController (e2e)', () => {
     }).compile();
     _user = module.get(getRepositoryToken(User));
     _post = module.get(getRepositoryToken(Post));
-    _question = module.get(getRepositoryToken(Question));
-    _answer = module.get(getRepositoryToken(Answer));
-    _application = module.get(getRepositoryToken(Application));
-    _like = module.get(getRepositoryToken(Like));
-    _certificate = module.get(getRepositoryToken(Certificate));
     app = module.createNestApplication();
     await app.init();
   });
@@ -678,10 +661,6 @@ describe('AppController (e2e)', () => {
   });
 
   describe('createAnswer', () => {
-    let question: Question;
-    beforeAll(async () => {
-      question = await _question.findOne(1);
-    });
     it('should create answer', () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
@@ -689,7 +668,7 @@ describe('AppController (e2e)', () => {
         .send({
           query: `
           mutation{
-            createAnswer(input:{questionId:${question.id}, text:"test"}){
+            createAnswer(input:{questionId:1, text:"test"}){
               ok
               error
             }
@@ -743,7 +722,7 @@ describe('AppController (e2e)', () => {
         .send({
           query: `
           mutation{
-            createAnswer(input:{questionId:${question.id}, text:"test"}){
+            createAnswer(input:{questionId:1, text:"test"}){
               ok
               error
             }
@@ -1086,6 +1065,94 @@ describe('AppController (e2e)', () => {
             body: {
               data: {
                 completePost: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+  });
+
+  describe('deletePost', () => {
+    let post: Post;
+    beforeAll(async () => {
+      post = await _post.findOne({ where: { title: testPost.title } });
+    });
+    it('should delete post', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{
+            deletePost(input:{postId:${post.id}}){
+              ok
+              error
+            }
+          }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                deletePost: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should fail with notFound postId', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{
+            deletePost(input:{postId:666}){
+              ok
+              error
+            }
+          }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                deletePost: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+    it('should fail without jwt of post.user', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${fakeJwt}` })
+        .send({
+          query: `
+          mutation{
+            deletePost(input:{postId:${post.id}}){
+              ok
+              error
+            }
+          }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                deletePost: { ok, error },
               },
             },
           } = res;
