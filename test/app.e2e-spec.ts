@@ -423,4 +423,69 @@ describe('AppController (e2e)', () => {
         });
     });
   });
+
+  describe('getPostDetail', () => {
+    let post: Post;
+    beforeAll(async () => {
+      post = await _post.findOne({ where: { title: testPost.title } });
+    });
+    it('should get post detail', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `{
+            getPostDetail(input:{postId:${post.id}}){
+              ok
+              error
+              post{
+                id
+              }
+              isMine
+              isLiked
+              isApplied
+            }
+          }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                getPostDetail: { ok, error, post, isMine, isLiked, isApplied },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+          expect(post).toEqual(expect.any(Object));
+          expect(isMine).toBe(false);
+          expect(isLiked).toBe(false);
+          expect(isApplied).toBe(false);
+        });
+    });
+    it('should fail with not found postId', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `{
+          getPostDetail(input:{postId:666}){
+            ok
+            error
+          }
+        }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                getPostDetail: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+  });
 });
