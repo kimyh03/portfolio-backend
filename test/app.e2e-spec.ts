@@ -496,7 +496,7 @@ describe('AppController (e2e)', () => {
         .send({
           query: `
           {
-            getPosts(args:{
+            getPosts(input:{
               page:1, 
               openOnly:false, 
               categories:[], 
@@ -527,6 +527,149 @@ describe('AppController (e2e)', () => {
           expect(posts).toEqual(expect.any(Array));
           expect(totalCount).toBe(1);
           expect(totalPage).toBe(1);
+        });
+    });
+  });
+
+  describe('toggleLike', () => {
+    let post: Post;
+    beforeAll(async () => {
+      post = await _post.findOne({ where: { title: testPost.title } });
+    });
+    it('should toggle like', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{toggleLike(input:{postId:${post.id}}){
+            ok
+            error
+          }}`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                toggleLike: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should fail with notFound postId', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{toggleLike(input:{postId:666}){
+            ok
+            error
+          }}`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                toggleLike: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+    it('should fail without jwt', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+          mutation{toggleLike(input:{postId:${post.id}}){
+            ok
+            error
+          }}`,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.errors[0].message).toBe('Forbidden resource');
+        });
+    });
+  });
+
+  describe('createQuestion', () => {
+    let post: Post;
+    beforeAll(async () => {
+      post = await _post.findOne({ where: { title: testPost.title } });
+    });
+    it('should create qeustion', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{createQuestion(input:{postId:${post.id}, text:"test"}){
+            ok
+            error
+          }}
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                createQuestion: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should fail with notFound postId', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+          mutation{createQuestion(input:{postId:666, text:"test"}){
+            ok
+            error
+          }}
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                createQuestion: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+    it('should fail without jwt', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+          mutation{createQuestion(input:{postId:${post.id}, text:"test"}){
+            ok
+            error
+          }}
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.errors[0].message).toBe('Forbidden resource');
         });
     });
   });
