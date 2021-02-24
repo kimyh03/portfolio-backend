@@ -246,4 +246,98 @@ describe('AppController (e2e)', () => {
         });
     });
   });
+
+  describe('getProfile', () => {
+    let user: User;
+    beforeAll(async () => {
+      user = await _user.findOne({
+        email: testUser.email,
+      });
+    });
+    it('should fail with notFound userId', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `{
+            getProfile(input:{userId:666}){
+              ok
+              error
+            }
+          }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                getProfile: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toEqual(expect.any(String));
+        });
+    });
+    it('should get my profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `{
+            getProfile(input:{userId:${user.id}}){
+              ok
+              error
+              isSelf
+              user{
+                id
+              }
+            }
+          }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                getProfile: { ok, error, isSelf, user },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+          expect(isSelf).toBe(true);
+          expect(user).toEqual(expect.any(Object));
+        });
+    });
+    it('should get others profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `{
+            getProfile(input:{userId:${user.id}}){
+              ok
+              error
+              isSelf
+              user{
+                id
+              }
+            }
+          }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                getProfile: { ok, error, isSelf, user },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+          expect(isSelf).toBe(false);
+          expect(user).toEqual(expect.any(Object));
+        });
+    });
+  });
 });
