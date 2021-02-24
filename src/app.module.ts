@@ -30,6 +30,7 @@ import { CommentModule } from './comment/comment.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
       validationSchema: Joi.object({
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.string().required(),
@@ -38,6 +39,7 @@ import { CommentModule } from './comment/comment.module';
         DATABASE_NAME: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
         HASH_ROUNDS: Joi.string().required(),
+        NODE_ENV: Joi.valid('dev', 'test'),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -47,7 +49,7 @@ import { CommentModule } from './comment/comment.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      logging: true,
+      logging: process.env.NODE_ENV !== 'test',
       synchronize: true,
       entities: [User, Post, Like, Question, Answer, Application, Certificate],
     }),
