@@ -3,7 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { getConnection, Repository } from 'typeorm';
-import { Post } from 'src/post/entities/post.entity';
+import {
+  Post,
+  postCategoryEnum,
+  postRigionEnum,
+} from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Question } from 'src/comment/entities/question.entity';
 import { Application } from 'src/application/entities/application.entity';
@@ -28,6 +32,17 @@ const testUser = {
   username: 'Hoony',
   email: 'Hoony@hoony.com',
   password: '123',
+};
+const testPost = {
+  title: 'test',
+  description: 'test',
+  category: postCategoryEnum.communityService,
+  rigion: postRigionEnum.Seoul,
+  adress: 'test',
+  host: 'test',
+  NumOfRecruitment: 1,
+  recognizedHours: 1,
+  date: '2020.11.11',
 };
 
 let fakeJwt: string;
@@ -337,6 +352,74 @@ describe('AppController (e2e)', () => {
           expect(error).toBe(null);
           expect(isSelf).toBe(false);
           expect(user).toEqual(expect.any(Object));
+        });
+    });
+  });
+
+  describe('createPost', () => {
+    it('should fail without jwt', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+            mutation{
+              createPost(input:{
+                title: "${testPost.title}",
+                description: "${testPost.description}",
+                category: ${testPost.category},
+                rigion: ${testPost.rigion},
+                adress: "${testPost.adress}",
+                host: "${testPost.host}",
+                NumOfRecruitment: ${testPost.NumOfRecruitment},
+                recognizedHours: ${testPost.recognizedHours},
+                date: "${testPost.date}"
+              }){
+                ok
+                error
+              }
+            }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.errors[0].message).toBe('Forbidden resource');
+        });
+    });
+    it('should create post', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set({ Authorization: `Bearer ${jwt}` })
+        .send({
+          query: `
+            mutation{
+              createPost(input:{
+                title: "${testPost.title}",
+                description: "${testPost.description}",
+                category: ${testPost.category},
+                rigion: ${testPost.rigion},
+                adress: "${testPost.adress}",
+                host: "${testPost.host}",
+                NumOfRecruitment: ${testPost.NumOfRecruitment},
+                recognizedHours: ${testPost.recognizedHours},
+                date: "${testPost.date}"
+              }){
+                ok
+                error
+              }
+            }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                createPost: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
         });
     });
   });
