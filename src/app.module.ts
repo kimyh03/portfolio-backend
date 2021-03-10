@@ -30,7 +30,7 @@ import { CommentModule } from './comment/comment.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
+      envFilePath: `.env.${process.env.NODE_ENV}`,
       validationSchema: Joi.object({
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.string().required(),
@@ -39,7 +39,7 @@ import { CommentModule } from './comment/comment.module';
         DATABASE_NAME: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
         HASH_ROUNDS: Joi.string().required(),
-        NODE_ENV: Joi.valid('dev', 'test'),
+        NODE_ENV: Joi.valid('dev', 'test', 'prod'),
       }),
     }),
     TypeOrmModule.forRoot({
