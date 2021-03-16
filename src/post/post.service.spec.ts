@@ -12,7 +12,7 @@ import { Post, postCategoryEnum, postRigionEnum } from './entities/post.entity';
 import { Question } from '../comment/entities/question.entity';
 import { PostService } from './post.service';
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
-const mockRepository = () => ({
+const mockRepository = jest.fn(() => ({
   findOne: jest.fn(),
   save: jest.fn(),
   create: jest.fn(),
@@ -20,7 +20,16 @@ const mockRepository = () => ({
   delete: jest.fn(),
   find: jest.fn(),
   remove: jest.fn(),
-});
+  getManyAndCount: jest.fn(),
+  createQueryBuilder: jest.fn().mockReturnValue({
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    offset: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+  }),
+}));
 
 describe('PostService', () => {
   let postService: PostService;
@@ -249,6 +258,183 @@ describe('PostService', () => {
       );
 
       expect(result).toEqual({ ok: true });
+    });
+  });
+
+  describe('getPosts', () => {
+    it('should success / searchTerm(x), openOnly(false), category(x), rigion(x)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [],
+        rigions: [],
+        searchTerm: '',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+
+    it('should success / searchTerm(x), openOnly(true), category(x), rigion(x)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: true,
+        categories: [postCategoryEnum.communityService],
+        rigions: [postRigionEnum.Seoul],
+        searchTerm: '',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+
+    it('should success / searchTerm(x), rigion(x), category(o)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [postCategoryEnum.communityService],
+        rigions: [],
+        searchTerm: '',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+
+    it('should success / searchTerm(x), rigion(o), category(x)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [],
+        rigions: [postRigionEnum.Seoul],
+        searchTerm: '',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+
+    it('should success / searchTerm(o), rigion(o), category(o)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [postCategoryEnum.communityService],
+        rigions: [postRigionEnum.Seoul],
+        searchTerm: 'test',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+    it('should success / searchTerm(o), rigion(x), category(x)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [],
+        rigions: [],
+        searchTerm: 'test',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+
+    it('should success / searchTerm(o), rigion(x), category(o)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [postCategoryEnum.communityService],
+        rigions: [],
+        searchTerm: 'test',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+
+    it('should success / searchTerm(o), rigion(o), category(x)', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [],
+        rigions: [postRigionEnum.Seoul],
+        searchTerm: 'test',
+      };
+      postRepository.createQueryBuilder;
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: true,
+        posts: [],
+        totalCount: 0,
+        totalPage: 0,
+      });
+    });
+
+    it('should fail on exception', async () => {
+      const getPostsArgs = {
+        page: 1,
+        openOnly: false,
+        categories: [],
+        rigions: [postRigionEnum.Seoul],
+        searchTerm: 'test',
+      };
+      postRepository.createQueryBuilder = jest.fn().mockReturnValue({
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockRejectedValue(new Error()),
+      });
+      const result = await postService.getPosts(getPostsArgs);
+
+      expect(result).toEqual({
+        ok: false,
+        error: '',
+      });
     });
   });
 
