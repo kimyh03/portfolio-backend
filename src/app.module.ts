@@ -25,6 +25,7 @@ import { JwtMiddleware } from './shared/auth/auth.middleware';
 import { S3Module } from './shared/S3/S3.module';
 import { LikeModule } from './like/like.module';
 import { CommentModule } from './comment/comment.module';
+import { RedisCacheModule } from './shared/cache/cache.module';
 
 @Module({
   imports: [
@@ -39,6 +40,9 @@ import { CommentModule } from './comment/comment.module';
         DATABASE_NAME: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
         HASH_ROUNDS: Joi.string().required(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.string().required(),
+        CACHE_TTL: Joi.string().required(),
         NODE_ENV: Joi.valid('dev', 'test', 'prod'),
       }),
     }),
@@ -63,6 +67,7 @@ import { CommentModule } from './comment/comment.module';
     S3Module,
     LikeModule,
     CommentModule,
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],
