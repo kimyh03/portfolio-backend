@@ -53,8 +53,6 @@ type User {
   username: String!
   password: String!
   avatar: String
-  activityCount: Float!
-  activityTime: Float!
   posts: [Post!]
   applications: [Application!]
   likes: [Like!]
@@ -202,6 +200,8 @@ type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
   getMe: User!
+  getRedis(key: String!): String!
+  setRedis(value: String!, key: String!): String!
   getPostDetail(input: GetPostDetailInput!): GetPostDetailOutput!
   getPosts(input: GetPostsInput!): GetPostsOutput!
 }

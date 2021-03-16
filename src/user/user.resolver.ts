@@ -2,6 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Auth } from 'src/shared/auth/auth.guard';
 import { AuthUser } from 'src/shared/auth/authUser.decorator';
+import { CacheService } from 'src/shared/cache/cache.service';
 import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
 import { SignInInput, SignInOutput } from './dtos/signIn.dto';
@@ -11,7 +12,10 @@ import { UserService } from './user.service';
 
 @Resolver()
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly cacheService: CacheService,
+  ) {}
   @Query(() => String)
   getHello() {
     return 'Hello';
@@ -49,5 +53,24 @@ export class UserResolver {
   @Query(() => User)
   async getMe(@AuthUser() authUser: User) {
     return authUser;
+  }
+
+  @Query(() => String)
+  async getRedis(@Args('key') key: string) {
+    try {
+      return await this.cacheService.get(key);
+    } catch (e) {
+      return 'error';
+    }
+  }
+
+  @Query(() => String)
+  async setRedis(@Args('key') key: string, @Args('value') value: string) {
+    try {
+      await this.cacheService.set(key, value);
+      return 'good';
+    } catch (e) {
+      return 'error';
+    }
   }
 }

@@ -9,8 +9,6 @@ import { SignInInput, SignInOutput } from './dtos/signIn.dto';
 import { ConfigService } from '@nestjs/config';
 import { HASH_ROUNDS } from 'src/shared/constants';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
-import { Like } from 'src/like/entities/like.entity';
-import { Application } from 'src/application/entities/application.entity';
 import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
 import { S3Service } from 'src/shared/S3/S3.service';
 
@@ -21,10 +19,6 @@ export class UserService {
     private readonly users: Repository<User>,
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-    @InjectRepository(Like)
-    private readonly likes: Repository<Like>,
-    @InjectRepository(Application)
-    private readonly applications: Repository<Application>,
     private readonly s3Service: S3Service,
   ) {}
 
