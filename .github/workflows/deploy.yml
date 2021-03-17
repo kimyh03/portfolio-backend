@@ -32,19 +32,6 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: portfolio
         IMAGE_TAG: ${{ github.sha }}
-        DATABASE_HOST: ${{secrets.DATABASE_HOST}}
-        DATABASE_PORT: ${{secrets.DATABASE_PORT}}
-        DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
-        DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-        DATABASE_NAME: ${{secrets.DATABASE_NAME}}
-        JWT_SECRET: ${{secrets.JWT_SECRET}}
-        HASH_ROUNDS: ${{secrets.HASH_ROUNDS}}
-        AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY}}
-        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-        S3_URL: ${{secrets.S3_URL}}
-        REDIS_HOST: ${{secrets.REDIS_HOST}}
-        REDIS_PORT: ${{secrets.REDIS_PORT}}
-        CACHE_TTL: ${{secrets.CACHE_TTL}}
       run: |
         # Build a docker container and
         # push it to ECR so that it can
