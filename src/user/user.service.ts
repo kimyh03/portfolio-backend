@@ -11,6 +11,8 @@ import { HASH_ROUNDS } from 'src/shared/constants';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
 import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
 import { S3Service } from 'src/shared/S3/S3.service';
+import { CacheService } from 'src/shared/cache/cache.service';
+import { GetMeOutput } from './dtos/getMe.dto';
 
 @Injectable()
 export class UserService {
@@ -20,6 +22,7 @@ export class UserService {
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
     private readonly s3Service: S3Service,
+    private readonly cacheService: CacheService,
   ) {}
 
   async signUp({
@@ -130,6 +133,7 @@ export class UserService {
         await this.s3Service.delete(user.avatar.split('avatar')[1]);
       }
       user.avatar = avatarUrl;
+      await this.cacheService.set(`user_${userId}`, user);
       await this.users.save(user);
       return {
         ok: true,
@@ -139,6 +143,26 @@ export class UserService {
         ok: false,
         error: e.message,
       };
+    }
+  }
+
+  async getMe(userId: number): Promise<GetMeOutput> {
+    try {
+      let user: User;
+      let fromWhere: string;
+      const userFromRedis = await this.cacheService.get(`user_${userId}`);
+      if (userFromRedis) {
+        user = userFromRedis;
+        fromWhere = 'redis';
+      } else {
+        const userFromDatabase = await this.users.findOneOrFail(userId);
+        await this.cacheService.set(`user_${userId}`, userFromDatabase);
+        user = userFromDatabase;
+        fromWhere = 'database';
+      }
+      return { ok: true, user, fromWhere };
+    } catch (e) {
+      return { ok: false, error: e.message };
     }
   }
 }

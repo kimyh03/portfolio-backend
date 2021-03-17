@@ -113,6 +113,13 @@ type EditAvatarOutput {
   error: String
 }
 
+type GetMeOutput {
+  ok: Boolean!
+  error: String
+  user: User
+  fromWhere: String
+}
+
 type GetprofileOutput {
   ok: Boolean!
   error: String
@@ -199,9 +206,7 @@ type CreateQuestionOutput {
 type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
-  getMe: User!
-  getRedis(key: String!): String!
-  setRedis(value: String!, key: String!): String!
+  getMe: GetMeOutput!
   getPostDetail(input: GetPostDetailInput!): GetPostDetailOutput!
   getPosts(input: GetPostsInput!): GetPostsOutput!
 }
