@@ -7,7 +7,7 @@ import { AuthService } from 'src/shared/auth/auth.service';
 import { SignUpInput, SignUpOutput } from './dtos/signUp.dto';
 import { SignInInput, SignInOutput } from './dtos/signIn.dto';
 import { ConfigService } from '@nestjs/config';
-import { HASH_ROUNDS } from 'src/shared/constants';
+import { HASH_ROUNDS, S3_URL } from 'src/shared/constants';
 import { GetProfileInput, GetprofileOutput } from './dtos/getProfile.dto';
 import { EditAvatarInput, EditAvatarOutput } from './dtos/editAvatar.dto';
 import { S3Service } from 'src/shared/S3/S3.service';
@@ -127,7 +127,7 @@ export class UserService {
     { avatarKey }: EditAvatarInput,
   ): Promise<EditAvatarOutput> {
     try {
-      const avatarUrl = `https://hoony-portfolio.s3.ap-northeast-2.amazonaws.com/${avatarKey}`;
+      const avatarUrl = `${this.configService.get(S3_URL)}${avatarKey}`;
       const user = await this.users.findOneOrFail(userId);
       if (user.avatar) {
         await this.s3Service.delete(user.avatar.split('avatar')[1]);
