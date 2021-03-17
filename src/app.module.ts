@@ -31,7 +31,8 @@ import { RedisCacheModule } from './shared/cache/cache.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
+      ignoreEnvFile: process.env.NODE_ENV === 'prod',
       validationSchema: Joi.object({
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.string().required(),
