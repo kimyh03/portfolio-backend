@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
+import { CacheService } from 'src/shared/cache/cache.service';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -29,6 +30,16 @@ const mockConfigService = () => ({
   get: jest.fn(),
 });
 
+const mockCacheServiceRedis = () => ({
+  get: jest.fn(() => 'user from redis'),
+  set: jest.fn(),
+});
+
+const mockCacheService = () => ({
+  get: jest.fn(),
+  set: jest.fn(),
+});
+
 const mockS3Service = () => ({
   delete: jest.fn(),
 });
@@ -44,6 +55,9 @@ describe('UserService', () => {
   let likeRepository: MockRepository<Like>;
   let applicationRepository: MockRepository<Application>;
   let s3Service: S3Service;
+  let cacheService: CacheService;
+
+  let redisState: boolean;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -73,6 +87,10 @@ describe('UserService', () => {
           provide: S3Service,
           useValue: mockS3Service(),
         },
+        {
+          provide: CacheService,
+          useValue: redisState ? mockCacheServiceRedis() : mockCacheService(),
+        },
       ],
     }).compile();
     userRepository = module.get(getRepositoryToken(User));
@@ -82,6 +100,7 @@ describe('UserService', () => {
     likeRepository = module.get(getRepositoryToken(Like));
     applicationRepository = module.get(getRepositoryToken(Application));
     s3Service = module.get<S3Service>(S3Service);
+    cacheService = module.get<CacheService>(CacheService);
   });
 
   it('should be defined', () => {
@@ -232,12 +251,18 @@ describe('UserService', () => {
     const findOneByIdArgs = {
       id: 1,
     };
-    it('shoulf find one', async () => {
+    it('should find one', async () => {
       userRepository.findOne.mockResolvedValue(findOneByIdArgs);
 
       const result = await userService.findOneById(1);
 
       expect(result).toBe(findOneByIdArgs);
     });
+  });
+
+  describe('getMe', () => {
+    it.todo('should find me from redis');
+    it.todo('should find me from database');
+    it.todo('should fail on exception');
   });
 });
