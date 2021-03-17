@@ -265,4 +265,48 @@ describe('UserService', () => {
     it.todo('should find me from database');
     it.todo('should fail on exception');
   });
+  describe('getMe (redisState = false)', () => {
+    beforeAll(() => (redisState = false));
+    it('should find me from database', async () => {
+      userRepository.findOneOrFail.mockResolvedValue('user from database');
+
+      const result = await userService.getMe(1);
+
+      expect(cacheService.get).toHaveBeenCalledTimes(1);
+      expect(userRepository.findOneOrFail).toHaveBeenCalledTimes(1);
+      expect(cacheService.set).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({
+        fromWhere: 'database',
+        ok: true,
+        user: 'user from database',
+      });
+    });
+
+    it('should fail on exception', async () => {
+      userRepository.findOneOrFail.mockRejectedValue(new Error('error'));
+
+      const result = await userService.getMe(1);
+
+      expect(result).toEqual({
+        ok: false,
+        error: 'error',
+      });
+    });
+  });
+  describe('getMe (redisState = true)', () => {
+    beforeAll(() => (redisState = true));
+    it('should find me from redis', async () => {
+      const result = await userService.getMe(1);
+
+      expect(userRepository.findOneOrFail).toHaveBeenCalledTimes(0);
+      expect(cacheService.set).toHaveBeenCalledTimes(0);
+
+      expect(result).toEqual({
+        fromWhere: 'redis',
+        ok: true,
+        user: 'user from redis',
+      });
+    });
+  });
 });
