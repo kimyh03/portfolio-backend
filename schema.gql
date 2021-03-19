@@ -207,6 +207,7 @@ type Query {
   getHello: String!
   getProfile(input: GetProfileInput!): GetprofileOutput!
   getMe: GetMeOutput!
+  getError: String!
   getPostDetail(input: GetPostDetailInput!): GetPostDetailOutput!
   getPosts(input: GetPostsInput!): GetPostsOutput!
 }

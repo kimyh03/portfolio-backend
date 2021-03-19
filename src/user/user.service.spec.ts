@@ -260,11 +260,6 @@ describe('UserService', () => {
     });
   });
 
-  describe('getMe', () => {
-    it.todo('should find me from redis');
-    it.todo('should find me from database');
-    it.todo('should fail on exception');
-  });
   describe('getMe (redisState = false)', () => {
     beforeAll(() => (redisState = false));
     it('should find me from database', async () => {

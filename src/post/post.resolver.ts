@@ -22,6 +22,11 @@ import { PostService } from './post.service';
 export class PostResolver {
   constructor(private postService: PostService) {}
 
+  @Query(() => String)
+  getError() {
+    throw new Error('new Error!!!');
+  }
+
   @UseGuards(Auth)
   @Mutation(() => CreatePostOutput)
   async createPost(
